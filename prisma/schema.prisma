@@ -158,6 +158,25 @@ model Event {
 
   registrations EventRegistration[]
   stages        EventStage[]
+  tickets       EventTicket[]
+}
+
+/// Modalidad de inscripción de un evento (p. ej. "Marcha completa", "Solo etapa 1",
+/// "Acompañante"). Cada una con su precio, su precio de socio y sus plazas.
+model EventTicket {
+  id               String   @id @default(cuid())
+  eventId          String
+  event            Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  priceCents       Int
+  memberPriceCents Int?
+  capacity         Int?     // plazas de esta modalidad (vacío = sin límite propio)
+  order            Int      @default(0)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  registrations EventRegistration[]
 }
 
 // Etapa de un evento (marcha, travesía, carrera por etapas…)
@@ -188,16 +207,19 @@ enum RegistrationStatus {
 }
 
 model EventRegistration {
-  id        String             @id @default(cuid())
-  eventId   String
-  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    RegistrationStatus @default(PENDING)
+  id          String             @id @default(cuid())
+  eventId     String
+  event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticketId    String?
+  ticket      EventTicket?       @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  ticketName  String?            // nombre de la modalidad al inscribirse, por si luego cambia
+  status      RegistrationStatus @default(PENDING)
   amountCents Int
-  notes     String?
-  paidAt    DateTime?
-  createdAt DateTime           @default(now())
+  notes       String?
+  paidAt      DateTime?
+  createdAt   DateTime           @default(now())
 
   @@unique([eventId, userId])
 }

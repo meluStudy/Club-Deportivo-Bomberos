@@ -10,7 +10,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 to-transparent" aria-hidden />
         <div className="relative flex h-full flex-col justify-end p-12">
           <p className="font-display text-sm font-semibold uppercase tracking-[0.3em] text-brand-400">Club Deportivo Bomberos de Madrid</p>
-          <h2 className="mt-3 text-6xl font-extrabold uppercase leading-[0.9]">Una cuenta.<br />Todo el club.</h2>
+          <h2 className="mt-3 text-6xl font-extrabold uppercase leading-[0.9]">Tu cuenta<br />del club</h2>
           <p className="mt-4 max-w-md text-ink-300">Gestiona tu cuota de socio, inscríbete en eventos, compra en la tienda oficial y sigue la actualidad del club.</p>
         </div>
       </div>

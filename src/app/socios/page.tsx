@@ -29,7 +29,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHero eyebrow="Socios" title="Forma parte de la familia" description={`La cuota de socio es anual (temporada ${season}) y se gestiona íntegramente online: alta, pago y renovación.`}>
+      <PageHero eyebrow="Socios" title="Hazte socio del club" description={`La cuota de socio es anual (temporada ${season}) y se gestiona íntegramente online: alta, pago y renovación.`}>
         {membership ? <ButtonLink href="/cuenta">Ver mi carné de socio</ButtonLink> : <ButtonLink href="#planes">Ver cuotas</ButtonLink>}
       </PageHero>
 

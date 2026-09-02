@@ -13,6 +13,7 @@ import { RegistrationPanel } from "@/components/event/registration-panel";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getActiveMembership } from "@/lib/data";
+import { getEventTickets } from "@/lib/tickets";
 import { site } from "@/lib/site";
 import { formatDate, formatPrice } from "@/lib/utils";
 import { EVENT_TABS, parseAccommodations, parseCustomHtml, parsePairs, parseProgram, visibleTabs, type EventTabKey } from "@/lib/event-page";
@@ -53,10 +54,12 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
   const html = parseCustomHtml(event.customHtml);
   const base = `/${event.slug}`;
 
-  const [membership, registration] = await Promise.all([
+  const [membership, registration, tickets] = await Promise.all([
     user ? getActiveMembership(user.id) : null,
     user ? prisma.eventRegistration.findUnique({ where: { eventId_userId: { eventId: event.id, userId: user.id } } }) : null,
+    getEventTickets(event.id),
   ]);
+  const isMember = Boolean(membership);
   const highlights = parsePairs(event.highlights);
   const stagesKm = event.stages.reduce((n, s) => n + (s.distanceKm ?? 0), 0);
   const totalEle = event.stages.reduce((n, s) => n + (s.elevationM ?? 0), 0);
@@ -125,7 +128,7 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
             </div>
             <aside className="lg:col-span-4">
               <div className="sticky top-36 space-y-4">
-                <RegistrationPanel event={event} user={user} isMember={Boolean(membership)} alreadyIn={registration?.status === "CONFIRMED"} messages={sp} returnTo={base} />
+                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} messages={sp} returnTo={base} />
                 <div className="rounded-2xl bg-ink-950 p-5 text-sm text-ink-200">
                   <p className="flex items-center gap-2"><MapPin className="size-4 text-brand-500" /> {event.location}</p>
                   <p className="mt-2 flex items-center gap-2"><Users className="size-4 text-brand-500" /> {event._count.registrations} inscritos{event.capacity ? ` · ${event.capacity} plazas` : ""}</p>
@@ -205,15 +208,47 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
           <div className="grid gap-12 lg:grid-cols-12">
             <Reveal className="lg:col-span-7">
               {event.registrationInfo ? <Markdown content={event.registrationInfo} className="text-lg" /> : <p className="text-ink-600">Completa la inscripción desde el panel de la derecha.</p>}
-              <dl className="mt-8 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-ink-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-ink-500">Precio general</dt><dd className="font-display text-3xl font-extrabold">{event.priceCents === 0 ? "Gratis" : formatPrice(event.priceCents)}</dd></div>
-                {event.memberPriceCents != null && <div className="rounded-2xl bg-brand-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-brand-700">Precio socios</dt><dd className="font-display text-3xl font-extrabold text-brand-700">{event.memberPriceCents === 0 ? "Gratis" : formatPrice(event.memberPriceCents)}</dd></div>}
-              </dl>
+              {tickets.length > 0 ? (
+                <div className="mt-8">
+                  <h2 className="mb-4 text-2xl font-bold uppercase">Modalidades</h2>
+                  <div className="overflow-x-auto rounded-2xl border border-ink-100">
+                    <table className="w-full min-w-[420px] text-sm">
+                      <thead>
+                        <tr className="border-b border-ink-100 bg-ink-50 text-left">
+                          <th className="px-4 py-3 font-bold uppercase tracking-wider text-ink-500">Modalidad</th>
+                          <th className="px-4 py-3 font-bold uppercase tracking-wider text-ink-500">General</th>
+                          <th className="px-4 py-3 font-bold uppercase tracking-wider text-ink-500">Socios</th>
+                          <th className="px-4 py-3 font-bold uppercase tracking-wider text-ink-500">Plazas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tickets.map((t) => (
+                          <tr key={t.id} className="border-b border-ink-50 last:border-0">
+                            <td className="px-4 py-3">
+                              <span className="font-semibold">{t.name}</span>
+                              {t.description && <span className="block text-ink-500">{t.description}</span>}
+                            </td>
+                            <td className="px-4 py-3 font-display text-lg font-bold">{t.priceCents === 0 ? "Gratis" : formatPrice(t.priceCents)}</td>
+                            <td className="px-4 py-3 text-brand-700">{t.memberPriceCents != null ? (t.memberPriceCents === 0 ? "Gratis" : formatPrice(t.memberPriceCents)) : "—"}</td>
+                            <td className="px-4 py-3">{t.soldOut ? <Badge tone="neutral">Completa</Badge> : t.capacity != null ? `${Math.max(0, t.capacity - t.taken)} libres` : "Disponible"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-3 text-sm text-ink-500">El precio de socio se aplica automáticamente al inscribirte con una cuenta de socio activa.</p>
+                </div>
+              ) : (
+                <dl className="mt-8 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-ink-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-ink-500">Precio general</dt><dd className="font-display text-3xl font-extrabold">{event.priceCents === 0 ? "Gratis" : formatPrice(event.priceCents)}</dd></div>
+                  {event.memberPriceCents != null && <div className="rounded-2xl bg-brand-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-brand-700">Precio socios</dt><dd className="font-display text-3xl font-extrabold text-brand-700">{event.memberPriceCents === 0 ? "Gratis" : formatPrice(event.memberPriceCents)}</dd></div>}
+                </dl>
+              )}
               {html.inscripciones && <div className="prose-club mt-8" dangerouslySetInnerHTML={{ __html: html.inscripciones }} />}
             </Reveal>
             <aside className="lg:col-span-5">
               <div className="sticky top-36">
-                <RegistrationPanel event={event} user={user} isMember={Boolean(membership)} alreadyIn={registration?.status === "CONFIRMED"} messages={sp} returnTo={`${base}/inscripciones`} />
+                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} messages={sp} returnTo={`${base}/inscripciones`} />
               </div>
             </aside>
           </div>
@@ -226,7 +261,9 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
               <ul className="space-y-3 text-ink-200">
                 <li className="flex items-center gap-3"><UserRound className="size-5 text-brand-500" /> {event.contactName ?? (event.section ? `Sección de ${event.section.name}` : site.name)}</li>
                 <li className="flex items-center gap-3"><Mail className="size-5 text-brand-500" /> <a href={`mailto:${event.contactEmail ?? event.section?.contactEmail ?? site.email}`} className="hover:text-white">{event.contactEmail ?? event.section?.contactEmail ?? site.email}</a></li>
-                <li className="flex items-center gap-3"><Phone className="size-5 text-brand-500" /> <a href={`tel:${(event.contactPhone ?? site.phone).replace(/\s/g, "")}`} className="hover:text-white">{event.contactPhone ?? site.phone}</a></li>
+                {event.contactPhone && (
+                  <li className="flex items-center gap-3"><Phone className="size-5 text-brand-500" /> <a href={`tel:${event.contactPhone.replace(/\s/g, "")}`} className="hover:text-white">{event.contactPhone}</a></li>
+                )}
                 <li className="flex items-start gap-3"><MapPin className="mt-0.5 size-5 text-brand-500" /> {event.location}</li>
               </ul>
             </Reveal>

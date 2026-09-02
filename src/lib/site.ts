@@ -8,7 +8,6 @@ export const site = {
     "Club Agrupación Deportiva Atlética Bomberos de Madrid. Atletismo, fútbol, rugby, ciclismo, natación y muchas más secciones. Noticias, eventos, tienda oficial y área de socios.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "info@clubdeportivobomberos.es",
-  phone: "+34 900 000 000",
   address: {
     line: "Parque de Bomberos nº 8, Calle Pío Felipe s/n",
     postalCode: "28038",
@@ -20,11 +19,12 @@ export const site = {
   },
   cif: "G-79411666",
   social: {
-    instagram: "https://instagram.com/cdbomberosmadrid",
-    twitter: "https://x.com/cdbomberosmadrid",
-    facebook: "https://facebook.com/cdbomberosmadrid",
-    youtube: "https://youtube.com/@cdbomberosmadrid",
-    tiktok: "https://tiktok.com/@cdbomberosmadrid",
+    instagram: "https://www.instagram.com/clubdeportivobomberosmadrid",
+    facebook: "https://www.facebook.com/profile.php?id=100065233671146",
+  },
+  socialHandles: {
+    instagram: "@clubdeportivobomberosmadrid",
+    facebook: "Club Deportivo Bomberos Madrid",
   },
   founded: 1985,
 };

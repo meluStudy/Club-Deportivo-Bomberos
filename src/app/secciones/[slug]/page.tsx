@@ -36,7 +36,7 @@ export default async function SectionPage({ params }: Props) {
       <Container className="grid gap-12 py-16 lg:grid-cols-12">
         <Reveal className="lg:col-span-7">
           <div className="mb-6 inline-flex size-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-glow">
-            <SectionIcon name={section.icon} className="size-7" />
+            <SectionIcon slug={section.slug} className="size-8" />
           </div>
           <Markdown content={section.description} className="text-lg" />
         </Reveal>

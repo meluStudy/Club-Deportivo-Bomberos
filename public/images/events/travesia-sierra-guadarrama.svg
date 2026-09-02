@@ -1,8 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e10600"/><stop offset="1" stop-color="#470505"/></linearGradient>
-<pattern id="p" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="28" fill="rgba(255,255,255,0.06)"/></pattern></defs>
-<rect width="1200" height="800" fill="url(#g)"/><rect width="1200" height="800" fill="url(#p)"/>
-<circle cx="1020" cy="160" r="360" fill="rgba(255,255,255,0.06)"/>
-<text x="60" y="730" font-family="Arial Narrow, Arial, sans-serif" font-weight="700" font-size="72" fill="rgba(255,255,255,0.9)" letter-spacing="2">EVENTO</text>
-<text x="60" y="770" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.55)">CLUB DEPORTIVO BOMBEROS MADRID</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+<defs>
+  <linearGradient id="fondo" x1="0.1" y1="0" x2="0.7" y2="1">
+    <stop offset="0" stop-color="#14203a"/><stop offset="0.5" stop-color="#16161b"/><stop offset="1" stop-color="#0b0b0d"/>
+  </linearGradient>
+  <linearGradient id="banda" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#e10600"/><stop offset="1" stop-color="#8c0f0b"/>
+  </linearGradient>
+  <radialGradient id="halo"><stop offset="0" stop-color="#e10600" stop-opacity="0.42"/><stop offset="1" stop-color="#e10600" stop-opacity="0"/></radialGradient>
+  <linearGradient id="sombra" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0b0b0d" stop-opacity="0"/><stop offset="1" stop-color="#0b0b0d" stop-opacity="0.92"/>
+  </linearGradient>
+  
+<pattern id="rayas" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <rect width="4" height="26" fill="rgba(255,255,255,0.05)"/>
+</pattern>
+<pattern id="puntos" width="18" height="18" patternUnits="userSpaceOnUse">
+  <circle cx="3" cy="3" r="2.1" fill="rgba(255,255,255,0.09)"/>
+</pattern>
+</defs>
+<rect width="1600" height="1000" fill="url(#fondo)"/>
+<circle cx="1312" cy="140" r="640" fill="url(#halo)"/>
+<rect width="1600" height="1000" fill="url(#puntos)"/>
+<g opacity="0.16" transform="translate(504 -20) scale(7.2)"><path d="M8 78 L34 34 L52 60 L64 44 L92 78 Z" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 44 L64 16" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 16 L82 22 L64 28" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="rotate(-10 800 610.0000000000001)">
+  <rect x="-400" y="610.0000000000001" width="2400" height="100" fill="url(#banda)" opacity="0.9"/>
+  <rect x="-400" y="745.0000000000001" width="2400" height="18" fill="#e10600" opacity="0.7"/>
+</g>
+<rect width="1600" height="1000" fill="url(#rayas)"/>
+<g opacity="0.9" transform="translate(96 60) scale(1.5)"><path d="M8 78 L34 34 L52 60 L64 44 L92 78 Z" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 44 L64 16" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 16 L82 22 L64 28" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<rect x="0" y="550" width="1600" height="450" fill="url(#sombra)"/>
 </svg>

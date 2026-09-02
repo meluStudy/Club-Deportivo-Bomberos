@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, Phone, Clock } from "lucide-react";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/social-icons";
+import { Mail, MapPin, Clock } from "lucide-react";
+import { FacebookIcon, InstagramIcon } from "@/components/social-icons";
 import { PageHero } from "@/components/ui/page-hero";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
@@ -24,7 +24,6 @@ export default function ContactPage() {
             <ul className="space-y-4 text-ink-200">
               <li className="flex items-start gap-3"><MapPin className="mt-0.5 size-5 shrink-0 text-brand-500" /><span>{fullAddress}</span></li>
               <li className="flex items-center gap-3"><Mail className="size-5 shrink-0 text-brand-500" /><a href={`mailto:${site.email}`} className="hover:text-white">{site.email}</a></li>
-              <li className="flex items-center gap-3"><Phone className="size-5 shrink-0 text-brand-500" /><a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hover:text-white">{site.phone}</a></li>
               <li className="flex items-start gap-3"><Clock className="mt-0.5 size-5 shrink-0 text-brand-500" /><span>Secretaría: lunes a viernes, 17:00 - 20:00</span></li>
             </ul>
           </Reveal>
@@ -32,9 +31,8 @@ export default function ContactPage() {
             <h2 className="mb-4 text-2xl font-bold uppercase">Síguenos</h2>
             <ul className="grid gap-2">
               {[
-                { href: site.social.instagram, label: "Instagram", handle: "@cdbomberosmadrid", Icon: InstagramIcon },
-                { href: site.social.facebook, label: "Facebook", handle: "CD Bomberos Madrid", Icon: FacebookIcon },
-                { href: site.social.youtube, label: "YouTube", handle: "@cdbomberosmadrid", Icon: YoutubeIcon },
+                { href: site.social.instagram, label: "Instagram", handle: site.socialHandles.instagram, Icon: InstagramIcon },
+                { href: site.social.facebook, label: "Facebook", handle: site.socialHandles.facebook, Icon: FacebookIcon },
               ].map(({ href, label, handle, Icon }) => (
                 <li key={label}>
                   <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl p-3 transition hover:bg-ink-50">

@@ -17,7 +17,6 @@ export function StructuredData() {
     logo: { "@type": "ImageObject", url: `${site.url}/icon-512.png`, width: 512, height: 512 },
     image: `${site.url}/images/og.png`,
     email: site.email,
-    telephone: site.phone,
     taxID: site.cif,
     foundingDate: String(site.founded),
     address: {

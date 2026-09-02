@@ -109,6 +109,8 @@ export type GpxStats = {
   maxEle: number;
   bounds: [[number, number], [number, number]];
   name?: string;
+  segments?: number;
+  hasElevation?: boolean;
 };
 
 function haversine(a: [number, number], b: [number, number]) {
@@ -119,54 +121,99 @@ function haversine(a: [number, number], b: [number, number]) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
-/** Analiza un GPX (trkpt o rtept) sin dependencias externas. */
-export function parseGpx(xml: string, maxPoints = 600): GpxStats | null {
-  const re = /<(?:trkpt|rtept)\s+[^>]*?lat="([-\d.]+)"[^>]*?lon="([-\d.]+)"[^>]*>([\s\S]*?)<\/(?:trkpt|rtept)>|<(?:trkpt|rtept)\s+[^>]*?lat="([-\d.]+)"[^>]*?lon="([-\d.]+)"[^>]*\/>/g;
-  const raw: [number, number, number][] = [];
+/**
+ * Analiza un archivo GPX sin dependencias externas.
+ * Tolera lo que traen los archivos reales: atributos en cualquier orden, comillas
+ * simples o dobles, prefijos de espacio de nombres (`<gpx:trkpt>`), etiquetas
+ * autocerradas, extensiones de Garmin o Strava y varios tramos por pista.
+ * La distancia no se acumula entre tramos distintos (evita saltos por pausas).
+ */
+export function parseGpx(xml: string, maxPoints = 700): GpxStats | null {
+  const segments: [number, number, number][][] = [];
+  let current: [number, number, number][] = [];
+
+  const tokenRe = /<(\/?)(?:[\w-]+:)?(trkseg|trkpt|rtept|rte|trk)\b([^>]*?)(\/?)>/gi;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(xml))) {
-    const lat = parseFloat(m[1] ?? m[4]);
-    const lon = parseFloat(m[2] ?? m[5]);
-    const eleMatch = m[3] ? /<ele>([-\d.]+)<\/ele>/.exec(m[3]) : null;
-    const ele = eleMatch ? parseFloat(eleMatch[1]) : 0;
-    if (Number.isFinite(lat) && Number.isFinite(lon)) raw.push([lat, lon, ele]);
-  }
-  if (raw.length < 2) return null;
+  const attr = (raw: string, name: string) => {
+    const a = new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, "i").exec(raw);
+    return a ? parseFloat(a[1]) : NaN;
+  };
 
+  while ((m = tokenRe.exec(xml))) {
+    const [, closing, tag, rawAttrs, selfClosing] = m;
+    const kind = tag.toLowerCase();
+
+    if (kind === "trkseg" || kind === "rte") {
+      // Un nuevo tramo corta la continuidad del recorrido
+      if (current.length) segments.push(current);
+      current = [];
+      continue;
+    }
+    if (closing || kind === "trk") continue;
+    if (kind !== "trkpt" && kind !== "rtept") continue;
+
+    const lat = attr(rawAttrs, "lat");
+    const lon = attr(rawAttrs, "lon");
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) continue;
+
+    let ele = 0;
+    if (!selfClosing) {
+      // La altitud va dentro del punto; se busca solo hasta que el punto se cierra
+      const rest = xml.slice(m.index + m[0].length, m.index + m[0].length + 2000);
+      const end = rest.search(/<\/(?:[\w-]+:)?(?:trkpt|rtept)>/i);
+      const inner = end === -1 ? rest : rest.slice(0, end);
+      const eleMatch = /<(?:[\w-]+:)?ele>\s*(-?[\d.]+)\s*<\//i.exec(inner);
+      if (eleMatch) ele = parseFloat(eleMatch[1]);
+    }
+    current.push([lat, lon, Number.isFinite(ele) ? ele : 0]);
+  }
+  if (current.length) segments.push(current);
+
+  const all = segments.flat();
+  if (all.length < 2) return null;
+
+  // Distancia: solo dentro de cada tramo
   let distanceKm = 0;
-  let gain = 0;
-  let loss = 0;
-  let minEle = raw[0][2];
-  let maxEle = raw[0][2];
-  let minLat = raw[0][0], maxLat = raw[0][0], minLon = raw[0][1], maxLon = raw[0][1];
-  // Suavizado sencillo de la elevación para no inflar el desnivel con ruido GPS
-  let smoothed = raw[0][2];
-  for (let i = 1; i < raw.length; i++) {
-    distanceKm += haversine([raw[i - 1][0], raw[i - 1][1]], [raw[i][0], raw[i][1]]);
-    const next = smoothed * 0.7 + raw[i][2] * 0.3;
-    const d = next - smoothed;
-    if (d > 0) gain += d;
-    else loss -= d;
-    smoothed = next;
-    minEle = Math.min(minEle, raw[i][2]);
-    maxEle = Math.max(maxEle, raw[i][2]);
-    minLat = Math.min(minLat, raw[i][0]); maxLat = Math.max(maxLat, raw[i][0]);
-    minLon = Math.min(minLon, raw[i][1]); maxLon = Math.max(maxLon, raw[i][1]);
+  for (const seg of segments) {
+    for (let i = 1; i < seg.length; i++) distanceKm += haversine([seg[i - 1][0], seg[i - 1][1]], [seg[i][0], seg[i][1]]);
   }
 
-  const step = Math.max(1, Math.ceil(raw.length / maxPoints));
-  const points = raw.filter((_, i) => i % step === 0 || i === raw.length - 1).map(([a, b, c]) => [Number(a.toFixed(5)), Number(b.toFixed(5)), Math.round(c)] as [number, number, number]);
-  const nameMatch = /<name>([^<]{1,120})<\/name>/.exec(xml);
+  // Desnivel: media móvil para quitar el ruido del GPS y umbral de 1 metro
+  const eles = all.map((p) => p[2]);
+  const hasEle = eles.some((e) => e !== 0);
+  const win = 5;
+  const smoothed = eles.map((_, i) => {
+    const from = Math.max(0, i - win), to = Math.min(eles.length, i + win + 1);
+    let sum = 0;
+    for (let j = from; j < to; j++) sum += eles[j];
+    return sum / (to - from);
+  });
+  let gain = 0, loss = 0, ref = smoothed[0];
+  for (const e of smoothed) {
+    const d = e - ref;
+    if (Math.abs(d) < 1) continue;
+    if (d > 0) gain += d; else loss -= d;
+    ref = e;
+  }
+
+  const lats = all.map((p) => p[0]), lons = all.map((p) => p[1]);
+  const step = Math.max(1, Math.ceil(all.length / maxPoints));
+  const points = all
+    .filter((_, i) => i % step === 0 || i === all.length - 1)
+    .map(([a, b, c]) => [Number(a.toFixed(5)), Number(b.toFixed(5)), Math.round(c)] as [number, number, number]);
+  const nameMatch = /<(?:[\w-]+:)?name>\s*(?:<!\[CDATA\[)?([^<\]]{1,120})/i.exec(xml);
 
   return {
     points,
     distanceKm: Math.round(distanceKm * 10) / 10,
-    elevationGain: Math.round(gain),
-    elevationLoss: Math.round(loss),
-    minEle: Math.round(minEle),
-    maxEle: Math.round(maxEle),
-    bounds: [[minLat, minLon], [maxLat, maxLon]],
-    name: nameMatch?.[1],
+    elevationGain: hasEle ? Math.round(gain) : 0,
+    elevationLoss: hasEle ? Math.round(loss) : 0,
+    minEle: hasEle ? Math.round(Math.min(...eles)) : 0,
+    maxEle: hasEle ? Math.round(Math.max(...eles)) : 0,
+    bounds: [[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]],
+    name: nameMatch?.[1]?.trim(),
+    segments: segments.length,
+    hasElevation: hasEle,
   };
 }
 
@@ -197,6 +244,8 @@ export type EventTemplate = {
     contactInfo: string;
   };
   stages: { name: string; startTime: string; startPlace: string; endPlace: string; distanceKm: number; elevationM: number; description: string; schedule: string }[];
+  /** Modalidades de inscripción que se crean con el evento. */
+  tickets: { name: string; description: string; priceCents: number; memberPriceCents: number | null; capacity: number | null }[];
 };
 
 export const EVENT_TEMPLATES: EventTemplate[] = [
@@ -219,6 +268,12 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
       { name: "Madrid – Cercedilla por el Alto del León", startTime: "08:00", startPlace: "Parque Central de Bomberos, Madrid", endPlace: "Cercedilla, plaza Mayor", distanceKm: 118, elevationM: 2100, description: "Salida neutralizada por Madrid hasta Las Rozas. Primer puerto en el Alto del León (1.511 m) por Guadarrama y descenso a San Rafael. Regreso por Los Molinos hasta Cercedilla.", schedule: "08:00 | Salida neutralizada | Parque Central\n09:15 | Fin de neutralizada, primer reagrupamiento | Las Rozas\n11:30 | Avituallamiento y reagrupamiento | Alto del León\n13:00 | Reagrupamiento | San Rafael\n14:30 | Llegada | Cercedilla" },
       { name: "Cercedilla – Madrid por Navacerrada y Morcuera", startTime: "08:30", startPlace: "Cercedilla, plaza Mayor", endPlace: "Parque Central de Bomberos, Madrid", distanceKm: 97, elevationM: 1800, description: "Etapa reina: Puerto de Navacerrada (1.858 m) y Puerto de la Morcuera (1.796 m) antes de bajar a Madrid por Colmenar Viejo. Corte de control en la Morcuera a las 12:30.", schedule: "08:30 | Salida | Cercedilla\n10:00 | Avituallamiento | Puerto de Navacerrada\n11:45 | Reagrupamiento | Rascafría\n12:30 | Corte de control | Puerto de la Morcuera\n14:00 | Llegada y comida | Parque Central" },
     ],
+    tickets: [
+      { name: "Marcha completa · 2 etapas", description: "Las dos etapas, maillot conmemorativo, avituallamientos, cena del sábado, desayuno del domingo y transporte de equipaje.", priceCents: 6500, memberPriceCents: 4500, capacity: 120 },
+      { name: "Solo etapa 1 · Madrid – Cercedilla", description: "Sábado. Incluye maillot, avituallamientos y comida de llegada. No incluye alojamiento ni cena.", priceCents: 3500, memberPriceCents: 2500, capacity: 40 },
+      { name: "Solo etapa 2 · Cercedilla – Madrid", description: "Domingo. Incluye maillot, avituallamientos y comida de clausura.", priceCents: 3500, memberPriceCents: 2500, capacity: 40 },
+      { name: "Acompañante", description: "Para quien no pedalea: cena del sábado, comida de clausura y transporte entre etapas.", priceCents: 3000, memberPriceCents: 2000, capacity: 50 },
+    ],
   },
   {
     key: "carrera",
@@ -236,6 +291,9 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
       contactInfo: "",
     },
     stages: [],
+    tickets: [
+      { name: "Inscripción general", description: "Dorsal con chip, camiseta técnica, avituallamiento y seguro.", priceCents: 1200, memberPriceCents: 800, capacity: null },
+    ],
   },
   {
     key: "en-blanco",
@@ -243,6 +301,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
     description: "Solo los datos básicos. Rellena las pestañas que necesites.",
     fields: { subtitle: "", highlights: "", intro: "", presentation: "", accommodation: "", accommodations: "", program: "", registrationInfo: "", contactInfo: "" },
     stages: [],
+    tickets: [],
   },
 ];
 

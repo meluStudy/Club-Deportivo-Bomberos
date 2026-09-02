@@ -147,6 +147,11 @@ async function main() {
     data: { highlights: tpl.fields.highlights.replace(/Recorrido \|.*/, `Recorrido | 2 etapas · ${Math.round(totalKm)} km · ${totalEle.toLocaleString("es-ES")} m+`) },
   });
 
+  await prisma.eventTicket.deleteMany({ where: { eventId: marcha.id } });
+  for (const [i, t] of tpl.tickets.entries()) {
+    await prisma.eventTicket.create({ data: { eventId: marcha.id, order: i, name: t.name, description: t.description, priceCents: t.priceCents, memberPriceCents: t.memberPriceCents, capacity: t.capacity } });
+  }
+
   // Responsable de la sección de ciclismo (puede crear noticias y eventos de su sección)
   await prisma.user.upsert({
     where: { email: "ciclismo@demo.es" },

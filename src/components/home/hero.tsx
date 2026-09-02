@@ -43,8 +43,8 @@ export function Hero() {
           <span className="h-0.5 w-10 bg-brand-500" aria-hidden />
           Club Deportivo Bomberos de Madrid
         </motion.p>
-        <h1 className="max-w-5xl text-6xl font-extrabold uppercase leading-[0.9] sm:text-7xl lg:text-8xl xl:text-[7.5rem]">
-          {["Fuego", "en las", "venas."].map((word, i) => (
+        <h1 className="max-w-5xl text-6xl font-extrabold uppercase leading-[0.9] sm:text-7xl lg:text-8xl">
+          {["Club", "Deportivo", "Bomberos de Madrid"].map((word, i) => (
             <motion.span
               key={word}
               className={i === 2 ? "block text-gradient" : "block"}
@@ -62,7 +62,7 @@ export function Hero() {
           transition={{ delay: 0.75, duration: 0.6 }}
           className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl"
         >
-          Deporte, compañerismo y compromiso con Madrid. Diez secciones deportivas, cientos de socios y una sola camiseta: la roja y negra.
+          Diez secciones deportivas abiertas a los bomberos del Ayuntamiento de Madrid, a sus familias y a quien quiera entrenar con nosotros.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

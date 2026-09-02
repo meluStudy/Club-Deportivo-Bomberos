@@ -66,8 +66,9 @@ Cada evento se publica en `/nombre-evento` con pestañas propias. Desde `/admin/
 - **Inicio**: datos destacados (`Etiqueta | Valor`) y texto de bienvenida.
 - **Presentación** y **Alojamiento**: texto en markdown sencillo; alojamientos recomendados en líneas `Nombre | Localidad | Precio | Contacto | Notas`.
 - **Programa**: `## Título del día` seguido de líneas `Hora | Qué | Punto de encuentro | Notas`.
-- **Etapas**: una o varias etapas con fecha, salida, llegada, descripción, horario (`Hora | Qué | Lugar`) y archivo GPX. Al subir el GPX la web calcula distancia y desnivel, dibuja el mapa (OpenStreetMap) y el perfil de altimetría y ofrece la descarga.
-- **Inscripciones**: texto informativo; el panel de inscripción y pago se genera con los precios de la ficha.
+- **Etapas**: una o varias etapas con fecha, salida, llegada, descripción, horario (`Hora | Qué | Lugar`) y archivo GPX. Al subir el GPX la web calcula distancia y desnivel, dibuja el mapa (OpenStreetMap) y el perfil de altimetría y ofrece la descarga. El lector de GPX admite los archivos que exportan Garmin, Strava, Wikiloc y similares: atributos en cualquier orden, espacios de nombres, etiquetas autocerradas, extensiones y varios tramos por pista.
+- **Inscripciones**: texto informativo; el panel de inscripción y pago se genera solo.
+- **Modalidades**: cada tipo de inscripción con su nombre, descripción, precio, precio de socio y plazas propias (por ejemplo *Marcha completa*, *Solo etapa 1*, *Acompañante*). Incluye el recuento de inscritos, las plazas ocupadas y lo recaudado por cada modalidad. Si no se crea ninguna, se usa el precio de la ficha del evento.
 - **Contacto**: persona, correo y teléfono de la organización.
 - **Inscritos**: listado con estado de pago y observaciones.
 
@@ -111,13 +112,19 @@ El logotipo completo no se lee a 16 píxeles, así que el favicon es una **adapt
 
 Para que el favicon salga en Google hace falta, además de los archivos: que el dominio esté publicado y accesible, que la web esté indexada y que la etiqueta `<link rel="icon">` apunte a una URL estable. Todo eso ya está en `src/app/layout.tsx`, junto con los datos estructurados de `src/components/structured-data.tsx` (ficha `SportsOrganization` con el nombre legal, el CIF, la dirección y el logotipo). Google puede tardar entre unos días y varias semanas en actualizarlo tras la publicación.
 
-### Otras imágenes
+### Ilustraciones provisionales
 
-Las fotografías siguen siendo marcadores de posición en SVG:
+Mientras no haya fotografías reales, la web usa ilustraciones generadas con la identidad del club: fondo oscuro con degradado, banda roja diagonal y el pictograma del deporte correspondiente. Se generan con:
+
+```bash
+npm run imagenes
+```
+
+El script está en `scripts/generar-imagenes.ts` y los pictogramas en `src/lib/pictogramas.ts` (los mismos que se usan en los iconos de sección de la web, para mantener un único trazo). Para sustituirlas por fotos reales basta con reemplazar los archivos:
 
 - Portada: `public/images/hero.svg`.
 - Secciones: `public/images/sections/<slug>.svg` (puede ser `.jpg`/`.png` cambiando la ruta desde el seed o el panel).
-- Noticias, eventos y productos: se editan desde el panel de administración indicando la ruta o URL de la imagen.
+- Noticias, eventos y productos: se editan desde el panel indicando la ruta o URL de la imagen.
 
 ## Despliegue
 

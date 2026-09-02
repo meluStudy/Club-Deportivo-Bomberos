@@ -56,6 +56,9 @@ export async function createEventAction(formData: FormData) {
       stages: template
         ? { create: template.stages.map((s, i) => ({ order: i, name: s.name, startTime: s.startTime, startPlace: s.startPlace, endPlace: s.endPlace, distanceKm: s.distanceKm, elevationM: s.elevationM, description: s.description, schedule: s.schedule })) }
         : undefined,
+      tickets: template
+        ? { create: template.tickets.map((t, i) => ({ order: i, name: t.name, description: t.description, priceCents: t.priceCents, memberPriceCents: t.memberPriceCents, capacity: t.capacity })) }
+        : undefined,
     },
   });
   refresh(slug);
@@ -199,4 +202,44 @@ export async function deleteEventAction(formData: FormData) {
   await prisma.event.delete({ where: { id: event.id } });
   refresh(event.slug);
   redirect("/admin/eventos");
+}
+
+// ─────────────────── Modalidades de inscripción ───────────────────
+
+export async function upsertTicketAction(formData: FormData) {
+  const { event } = await loadEvent(str(formData, "eventId"));
+  const ticketId = str(formData, "ticketId");
+  const data = {
+    name: str(formData, "name") || "Modalidad",
+    description: opt(formData, "description"),
+    priceCents: cents(formData, "price"),
+    memberPriceCents: optCents(formData, "memberPrice"),
+    capacity: str(formData, "capacity") ? Math.floor(num(formData, "capacity")) : null,
+    order: str(formData, "order") ? Math.floor(num(formData, "order")) : 0,
+    active: formData.get("active") !== null,
+  };
+  if (ticketId) {
+    const t = await prisma.eventTicket.findUnique({ where: { id: ticketId } });
+    if (!t || t.eventId !== event.id) redirect(`/admin/eventos/${event.id}?tab=modalidades`);
+    await prisma.eventTicket.update({ where: { id: ticketId }, data });
+  } else {
+    const count = await prisma.eventTicket.count({ where: { eventId: event.id } });
+    await prisma.eventTicket.create({ data: { ...data, eventId: event.id, order: data.order || count } });
+  }
+  refresh(event.slug);
+  redirect(`/admin/eventos/${event.id}?tab=modalidades&ok=1`);
+}
+
+export async function deleteTicketAction(formData: FormData) {
+  const { event } = await loadEvent(str(formData, "eventId"));
+  const ticketId = str(formData, "ticketId");
+  const used = await prisma.eventRegistration.count({ where: { ticketId } });
+  if (used > 0) {
+    // Con inscritos no se borra: se desactiva para no perder el histórico
+    await prisma.eventTicket.updateMany({ where: { id: ticketId, eventId: event.id }, data: { active: false } });
+  } else {
+    await prisma.eventTicket.deleteMany({ where: { id: ticketId, eventId: event.id } });
+  }
+  refresh(event.slug);
+  redirect(`/admin/eventos/${event.id}?tab=modalidades`);
 }

@@ -43,7 +43,7 @@ export function SectionCard({ section }: { section: { slug: string; name: string
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" aria-hidden />
         <div className="absolute inset-x-0 bottom-0 p-5 text-white">
           <span className="mb-3 inline-flex size-11 items-center justify-center rounded-full bg-brand-600 text-white shadow-glow">
-            <SectionIcon name={section.icon} className="size-5" />
+            <SectionIcon slug={section.slug} className="size-6" />
           </span>
           <h3 className="text-3xl font-extrabold uppercase leading-none">{section.name}</h3>
           <p className="mt-1 line-clamp-2 text-sm text-ink-200">{section.tagline}</p>

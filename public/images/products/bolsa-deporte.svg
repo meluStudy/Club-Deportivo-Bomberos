@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" width="900" height="900">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e10600"/><stop offset="1" stop-color="#470505"/></linearGradient>
-<pattern id="p" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="28" fill="rgba(255,255,255,0.06)"/></pattern></defs>
-<rect width="900" height="900" fill="url(#g)"/><rect width="900" height="900" fill="url(#p)"/>
-<circle cx="765" cy="180" r="405" fill="rgba(255,255,255,0.06)"/>
-<text x="60" y="830" font-family="Arial Narrow, Arial, sans-serif" font-weight="700" font-size="81" fill="rgba(255,255,255,0.9)" letter-spacing="2">BOLSA DEPORTE</text>
-<text x="60" y="870" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.55)">CLUB DEPORTIVO BOMBEROS MADRID</text>
+<defs>
+  <linearGradient id="f" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#f7f7f8"/><stop offset="1" stop-color="#e6e6ea"/></linearGradient>
+  <pattern id="p" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.6" fill="rgba(11,11,13,0.05)"/></pattern>
+</defs>
+<rect width="900" height="900" fill="url(#f)"/>
+<rect width="900" height="900" fill="url(#p)"/>
+<circle cx="450" cy="468" r="297" fill="#ffffff" opacity="0.85"/>
+<circle cx="450" cy="468" r="297" fill="none" stroke="#e10600" stroke-width="5.4" opacity="0.22"/>
+<g opacity="0.92" transform="translate(171 180) scale(5.58)"><path d="M14 42 L86 42 Q92 42 92 50 L92 74 Q92 82 84 82 L16 82 Q8 82 8 74 L8 50 Q8 42 14 42 Z" fill="none" stroke="#e10600" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M36 42 L36 30 Q36 24 42 24 L58 24 Q64 24 64 30 L64 42" fill="none" stroke="#e10600" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 60 L92 60" fill="none" stroke="#e10600" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<rect x="0" y="882" width="900" height="18" fill="#e10600"/>
 </svg>

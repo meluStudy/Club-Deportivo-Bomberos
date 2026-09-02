@@ -115,7 +115,7 @@ export default async function HomePage() {
         <Container className="relative grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
             <p className="mb-3 font-display text-sm font-semibold uppercase tracking-[0.2em] text-white/80">Socios</p>
-            <h2 className="text-5xl font-extrabold uppercase leading-[0.95] sm:text-6xl">Forma parte de la familia roja y negra</h2>
+            <h2 className="text-5xl font-extrabold uppercase leading-[0.95] sm:text-6xl">Hazte socio del club</h2>
             <p className="mt-5 max-w-lg text-lg text-white/85">
               Acceso a todas las secciones, seguro deportivo, descuentos en tienda y eventos, y voz en la vida del club. La cuota es anual y se
               gestiona íntegramente desde esta web.

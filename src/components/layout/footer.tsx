@@ -1,15 +1,12 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
-import { FacebookIcon, InstagramIcon, TikTokIcon, XIcon, YoutubeIcon } from "@/components/social-icons";
+import { Mail, MapPin, ArrowUpRight } from "lucide-react";
+import { FacebookIcon, InstagramIcon } from "@/components/social-icons";
 import { fullAddress, legalNav, mainNav, site } from "@/lib/site";
 import { Logo } from "./logo";
 
 const socials = [
   { href: site.social.instagram, label: "Instagram", Icon: InstagramIcon },
-  { href: site.social.twitter, label: "X (Twitter)", Icon: XIcon },
   { href: site.social.facebook, label: "Facebook", Icon: FacebookIcon },
-  { href: site.social.youtube, label: "YouTube", Icon: YoutubeIcon },
-  { href: site.social.tiktok, label: "TikTok", Icon: TikTokIcon },
 ];
 
 export function Footer({ sections }: { sections: { slug: string; name: string }[] }) {
@@ -23,7 +20,9 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-12 sm:px-6 md:flex-row md:items-center lg:px-8">
           <div>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-brand-400">Únete al club</p>
-            <h2 className="mt-1 text-4xl font-extrabold uppercase text-white sm:text-5xl">Somos más que un club. Somos familia.</h2>
+            <h2 className="mt-1 max-w-2xl text-4xl font-extrabold uppercase leading-none text-white sm:text-5xl">
+              Entrena, compite y comparte con el club
+            </h2>
           </div>
           <Link
             href="/socios"
@@ -91,12 +90,6 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
             <Mail className="size-4 shrink-0 text-brand-500" />
             <a href={`mailto:${site.email}`} className="hover:text-white">
               {site.email}
-            </a>
-          </li>
-          <li className="flex items-center gap-2">
-            <Phone className="size-4 shrink-0 text-brand-500" />
-            <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hover:text-white">
-              {site.phone}
             </a>
           </li>
         </FooterCol>

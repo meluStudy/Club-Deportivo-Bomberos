@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getActiveMembership } from "@/lib/data";
+import { getEventTickets, ticketPrice } from "@/lib/tickets";
 import { startCheckout } from "@/lib/payments";
 
 export async function registerForEventAction(formData: FormData) {
@@ -22,18 +23,34 @@ export async function registerForEventAction(formData: FormData) {
   if (existing?.status === "CONFIRMED") redirect(`${back}?info=inscrito`);
 
   const membership = await getActiveMembership(user.id);
-  const amountCents = membership && event.memberPriceCents != null ? event.memberPriceCents : event.priceCents;
+  const isMember = Boolean(membership);
+
+  // Si el evento tiene modalidades, el precio y las plazas salen de la elegida
+  const tickets = await getEventTickets(event.id);
+  const chosenId = String(formData.get("ticketId") ?? "");
+  let ticket = tickets.find((t) => t.id === chosenId) ?? null;
+  if (tickets.length > 0) {
+    if (!ticket) {
+      // Sin elección válida: si solo hay una modalidad se toma esa, si no se pide elegir
+      if (tickets.length === 1) ticket = tickets[0];
+      else redirect(`${back}?error=modalidad`);
+    }
+    if (ticket!.soldOut) redirect(`${back}?error=modalidad-completa`);
+  }
+
+  const amountCents = ticket ? ticketPrice(ticket, isMember) : isMember && event.memberPriceCents != null ? event.memberPriceCents : event.priceCents;
+  const ticketData = { ticketId: ticket?.id ?? null, ticketName: ticket?.name ?? null };
 
   const registration = existing
-    ? await prisma.eventRegistration.update({ where: { id: existing.id }, data: { status: "PENDING", amountCents, notes } })
-    : await prisma.eventRegistration.create({ data: { eventId: event.id, userId: user.id, amountCents, notes } });
+    ? await prisma.eventRegistration.update({ where: { id: existing.id }, data: { status: "PENDING", amountCents, notes, ...ticketData } })
+    : await prisma.eventRegistration.create({ data: { eventId: event.id, userId: user.id, amountCents, notes, ...ticketData } });
 
   const url = await startCheckout({
     type: "EVENT",
     referenceId: registration.id,
     userId: user.id,
     email: user.email,
-    items: [{ name: `Inscripción · ${event.title}`, description: event.location, amountCents, quantity: 1 }],
+    items: [{ name: `Inscripción · ${event.title}`, description: ticket ? `${ticket.name} · ${event.location}` : event.location, amountCents, quantity: 1 }],
     successPath: `${back}?pago=ok`,
     cancelPath: `${back}?cancelado=1`,
   });

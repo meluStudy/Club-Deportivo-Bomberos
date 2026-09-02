@@ -8,12 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, Field, inputClass, textareaClass } from "@/components/ui/form";
 import { cn, formatPrice } from "@/lib/utils";
 import { EVENT_TABS, parseCustomHtml, parseGpxStats, type EventTabKey } from "@/lib/event-page";
-import { deleteEventAction, deleteStageAction, removeStageGpxAction, updateEventBasicsAction, updateEventTabAction, upsertStageAction } from "@/actions/event-admin";
+import { deleteEventAction, deleteStageAction, deleteTicketAction, removeStageGpxAction, updateEventBasicsAction, updateEventTabAction, upsertStageAction, upsertTicketAction } from "@/actions/event-admin";
+import { getTicketBreakdown } from "@/lib/tickets";
+import { Stat } from "@/components/admin/ui";
 
 const toLocal = (d: Date | null | undefined) => (d ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "");
 const toDay = (d: Date | null | undefined) => (d ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10) : "");
 
-const ADMIN_TABS = [{ key: "ficha", label: "Ficha" }, ...EVENT_TABS.map((t) => ({ key: t.key, label: t.label })), { key: "inscritos", label: "Inscritos" }];
+const ADMIN_TABS = [{ key: "ficha", label: "Ficha" }, ...EVENT_TABS.map((t) => ({ key: t.key, label: t.label })), { key: "modalidades", label: "Modalidades" }, { key: "inscritos", label: "Inscritos" }];
 
 export default async function AdminEventEditor({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
   const { id } = await params;
@@ -21,11 +23,17 @@ export default async function AdminEventEditor({ params, searchParams }: { param
   const staff = await requireStaff();
   const event = await prisma.event.findUnique({
     where: { id },
-    include: { section: true, stages: { orderBy: { order: "asc" } }, registrations: { include: { user: true }, orderBy: { createdAt: "asc" } } },
+    include: {
+      section: true,
+      stages: { orderBy: { order: "asc" } },
+      tickets: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
+      registrations: { include: { user: true }, orderBy: { createdAt: "asc" } },
+    },
   });
   if (!event) notFound();
   if (!canManageSection(staff, event.sectionId)) redirect("/admin/eventos?error=permiso");
   const sections = isAdmin(staff) ? await prisma.section.findMany({ orderBy: { order: "asc" } }) : [];
+  const breakdown = await getTicketBreakdown(event.id);
   const tab = ADMIN_TABS.some((t) => t.key === sp.tab) ? sp.tab! : "ficha";
   const html = parseCustomHtml(event.customHtml);
   const admin = isAdmin(staff);
@@ -155,28 +163,128 @@ export default async function AdminEventEditor({ params, searchParams }: { param
           </>
         ), "Si no se rellena, se muestran los datos de la sección o del club.")}
 
+        {tab === "modalidades" && (
+          <div className="space-y-6">
+            <p className="rounded-xl bg-ink-50 p-3 text-sm text-ink-600">
+              Cada modalidad tiene su nombre, su precio, su precio de socio y sus plazas. Si no creas ninguna, se usa el precio de la ficha del
+              evento. Las modalidades con inscritos no se borran: se desactivan para conservar el histórico.
+            </p>
+
+            {breakdown.rows.length > 0 && (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <Stat label="Inscritos confirmados" value={breakdown.totals.confirmed} sub={`${breakdown.totals.pending} pendientes de pago`} accent />
+                <Stat label="Recaudado" value={formatPrice(breakdown.totals.revenueCents)} sub="inscripciones confirmadas" />
+                <Stat label="Modalidades" value={breakdown.rows.length} sub={`${breakdown.rows.filter((r) => r.active).length} activas`} />
+                <Stat label="Cancelaciones" value={breakdown.totals.cancelled} />
+              </div>
+            )}
+
+            {breakdown.rows.length > 0 && (
+              <Table>
+                <thead>
+                  <tr>
+                    <th className={th}>Modalidad</th><th className={th}>Precio</th><th className={th}>Socios</th>
+                    <th className={th}>Confirmados</th><th className={th}>Pendientes</th><th className={th}>Plazas</th><th className={th}>Recaudado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {breakdown.rows.map((r) => {
+                    const pct = r.capacity ? Math.min(100, Math.round((r.confirmed / r.capacity) * 100)) : null;
+                    return (
+                      <tr key={r.id}>
+                        <td className={td}>{r.name} {!r.active && <Badge tone="neutral">Inactiva</Badge>}</td>
+                        <td className={td}>{formatPrice(r.priceCents)}</td>
+                        <td className={td}>{r.memberPriceCents != null ? formatPrice(r.memberPriceCents) : "—"}</td>
+                        <td className={td}><strong className="font-display text-lg">{r.confirmed}</strong></td>
+                        <td className={td}>{r.pending}</td>
+                        <td className={td}>
+                          {r.capacity != null ? (
+                            <span className="block w-32">
+                              <span className="text-xs">{r.confirmed} / {r.capacity}</span>
+                              <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-ink-100">
+                                <span className="block h-full rounded-full bg-brand-600" style={{ width: `${pct}%` }} />
+                              </span>
+                            </span>
+                          ) : "Sin límite"}
+                        </td>
+                        <td className={td}><strong>{formatPrice(r.revenueCents)}</strong></td>
+                      </tr>
+                    );
+                  })}
+                  {breakdown.orphan && (
+                    <tr>
+                      <td className={td}><span className="text-ink-500">{breakdown.orphan.name}</span></td>
+                      <td className={td} colSpan={2}>—</td>
+                      <td className={td}>{breakdown.orphan.confirmed}</td>
+                      <td className={td}>{breakdown.orphan.pending}</td>
+                      <td className={td}>—</td>
+                      <td className={td}>{formatPrice(breakdown.orphan.revenueCents)}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            )}
+
+            {event.tickets.map((t, i) => (
+              <Details key={t.id} summary={`${i + 1}. ${t.name} · ${formatPrice(t.priceCents)}${t.capacity != null ? ` · ${t.capacity} plazas` : ""}${t.active ? "" : " · inactiva"}`}>
+                <TicketForm eventId={event.id} ticket={t} />
+                <div className="mt-4">
+                  <form action={deleteTicketAction}>
+                    <input type="hidden" name="eventId" value={event.id} />
+                    <input type="hidden" name="ticketId" value={t.id} />
+                    <button className="text-xs text-ink-500 underline hover:text-brand-600">Eliminar modalidad</button>
+                  </form>
+                </div>
+              </Details>
+            ))}
+            <Details summary="➕ Añadir modalidad"><TicketForm eventId={event.id} /></Details>
+          </div>
+        )}
+
         {tab === "inscritos" && (
           <>
             <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold uppercase"><Users className="size-5 text-brand-600" /> Inscritos ({event.registrations.filter((r) => r.status === "CONFIRMED").length} confirmados)</h2>
             <Table>
-              <thead><tr><th className={th}>Nombre</th><th className={th}>Contacto</th><th className={th}>Importe</th><th className={th}>Estado</th><th className={th}>Observaciones</th></tr></thead>
+              <thead><tr><th className={th}>Nombre</th><th className={th}>Contacto</th><th className={th}>Modalidad</th><th className={th}>Importe</th><th className={th}>Estado</th><th className={th}>Observaciones</th></tr></thead>
               <tbody>
                 {event.registrations.map((r) => (
                   <tr key={r.id}>
                     <td className={td}>{r.user.name}</td>
                     <td className={td}>{r.user.email}<br /><span className="text-ink-500">{r.user.phone ?? ""}</span></td>
+                    <td className={td}>{r.ticketName ?? "—"}</td>
                     <td className={td}>{formatPrice(r.amountCents)}</td>
                     <td className={td}><Badge tone={r.status === "CONFIRMED" ? "success" : r.status === "PENDING" ? "warning" : "neutral"}>{r.status === "CONFIRMED" ? "Confirmada" : r.status === "PENDING" ? "Pendiente" : "Cancelada"}</Badge></td>
                     <td className={td}>{r.notes ?? "—"}</td>
                   </tr>
                 ))}
-                {event.registrations.length === 0 && <tr><td className={td} colSpan={5}><span className="text-ink-500">Sin inscripciones todavía.</span></td></tr>}
+                {event.registrations.length === 0 && <tr><td className={td} colSpan={6}><span className="text-ink-500">Sin inscripciones todavía.</span></td></tr>}
               </tbody>
             </Table>
           </>
         )}
       </section>
     </>
+  );
+}
+
+function TicketForm({ eventId, ticket }: { eventId: string; ticket?: { id: string; name: string; description: string | null; priceCents: number; memberPriceCents: number | null; capacity: number | null; order: number; active: boolean } }) {
+  return (
+    <form action={upsertTicketAction} className="grid gap-4 sm:grid-cols-2">
+      <input type="hidden" name="eventId" value={eventId} />
+      {ticket && <input type="hidden" name="ticketId" value={ticket.id} />}
+      <Field label="Nombre de la modalidad" name="name" className="sm:col-span-2">
+        <input name="name" defaultValue={ticket?.name} required className={inputClass} placeholder="Marcha completa (2 etapas)" />
+      </Field>
+      <Field label="Descripción (opcional)" name="description" className="sm:col-span-2">
+        <textarea name="description" defaultValue={ticket?.description ?? ""} className={textareaClass} placeholder="Incluye maillot, avituallamientos, cena del sábado y transporte de equipaje." />
+      </Field>
+      <Field label="Precio general (€)" name="price"><input name="price" type="number" step="0.01" min={0} defaultValue={ticket ? ticket.priceCents / 100 : ""} required className={inputClass} /></Field>
+      <Field label="Precio socios (€, opcional)" name="memberPrice"><input name="memberPrice" type="number" step="0.01" min={0} defaultValue={ticket?.memberPriceCents != null ? ticket.memberPriceCents / 100 : ""} className={inputClass} /></Field>
+      <Field label="Plazas de esta modalidad (vacío = sin límite)" name="capacity"><input name="capacity" type="number" min={1} defaultValue={ticket?.capacity ?? ""} className={inputClass} /></Field>
+      <Field label="Orden" name="order"><input name="order" type="number" min={0} defaultValue={ticket?.order ?? ""} className={inputClass} /></Field>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="active" defaultChecked={ticket?.active ?? true} className="size-4 accent-brand-600" /> Visible en la web</label>
+      <div className="sm:col-span-2"><button className={smallBtn}>{ticket ? "Guardar modalidad" : "Añadir modalidad"}</button></div>
+    </form>
   );
 }
 
