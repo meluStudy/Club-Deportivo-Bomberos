@@ -73,7 +73,7 @@ export function EventCard({ event }: EventCardProps) {
   const full = event.capacity != null && (event._count?.registrations ?? 0) >= event.capacity;
   return (
     <Card className="h-full">
-      <Link href={`/eventos/${event.slug}`} className="flex h-full flex-col sm:flex-row">
+      <Link href={`/${event.slug}`} className="flex h-full flex-col sm:flex-row">
         <div className="relative aspect-[16/9] sm:aspect-auto sm:w-44 sm:shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={event.coverImage ?? "/images/hero.svg"} alt="" className="h-full w-full object-cover" />

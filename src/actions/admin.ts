@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { canManageSection, isAdmin, requireAdmin, requireStaff } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
@@ -72,48 +72,24 @@ export async function updateOrderStatusAction(formData: FormData) {
   refresh();
 }
 
-// ─── Eventos ───
-export async function upsertEventAction(formData: FormData) {
-  await requireAdmin();
-  const id = str(formData, "id");
-  const title = str(formData, "title");
-  const data = {
-    title,
-    slug: str(formData, "slug") || slugify(title),
-    description: str(formData, "description"),
-    location: str(formData, "location"),
-    startsAt: new Date(str(formData, "startsAt")),
-    registrationDeadline: str(formData, "deadline") ? new Date(str(formData, "deadline")) : null,
-    priceCents: cents(formData, "price"),
-    memberPriceCents: optCents(formData, "memberPrice"),
-    capacity: str(formData, "capacity") ? Math.floor(num(formData, "capacity")) : null,
-    sectionId: str(formData, "sectionId") || null,
-    coverImage: str(formData, "image") || null,
-    published: formData.get("published") === "on",
-  };
-  if (id) await prisma.event.update({ where: { id }, data });
-  else await prisma.event.create({ data });
-  refresh();
-}
-
-export async function deleteEventAction(formData: FormData) {
-  await requireAdmin();
-  await prisma.event.delete({ where: { id: str(formData, "id") } });
-  refresh();
-}
-
 // ─── Noticias ───
 export async function upsertPostAction(formData: FormData) {
-  const admin = await requireAdmin();
+  const admin = await requireStaff();
   const id = str(formData, "id");
   const title = str(formData, "title");
+  const sectionId = isAdmin(admin) ? str(formData, "sectionId") || null : admin.managedSectionId;
+  if (!canManageSection(admin, sectionId)) return;
+  if (id) {
+    const current = await prisma.post.findUnique({ where: { id } });
+    if (!current || !canManageSection(admin, current.sectionId)) return;
+  }
   const data = {
     title,
     slug: str(formData, "slug") || slugify(title),
     excerpt: str(formData, "excerpt"),
     content: str(formData, "content"),
     coverImage: str(formData, "image") || null,
-    sectionId: str(formData, "sectionId") || null,
+    sectionId,
     featured: formData.get("featured") === "on",
     publishedAt: formData.get("published") === "on" ? new Date() : null,
     authorId: admin.id,
@@ -126,8 +102,10 @@ export async function upsertPostAction(formData: FormData) {
 }
 
 export async function deletePostAction(formData: FormData) {
-  await requireAdmin();
-  await prisma.post.delete({ where: { id: str(formData, "id") } });
+  const staff = await requireStaff();
+  const post = await prisma.post.findUnique({ where: { id: str(formData, "id") } });
+  if (!post || !canManageSection(staff, post.sectionId)) return;
+  await prisma.post.delete({ where: { id: post.id } });
   refresh();
 }
 
@@ -136,8 +114,9 @@ export async function setUserRoleAction(formData: FormData) {
   const admin = await requireAdmin();
   const id = str(formData, "id");
   const role = str(formData, "role") as "ADMIN" | "SOCIO" | "PARTICIPANTE";
+  const managedSectionId = str(formData, "managedSectionId") || null;
   if (id === admin.id) return;
-  await prisma.user.update({ where: { id }, data: { role } });
+  await prisma.user.update({ where: { id }, data: { role, managedSectionId } });
   refresh();
 }
 

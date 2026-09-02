@@ -28,6 +28,9 @@ model User {
   dni           String?
   birthDate     DateTime?
   isFirefighter Boolean  @default(false) // Bombero del Ayuntamiento de Madrid
+  // Responsable de sección: puede gestionar noticias y eventos de esa sección desde el panel
+  managedSectionId String?
+  managedSection   Section? @relation("SectionManagers", fields: [managedSectionId], references: [id], onDelete: SetNull)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -92,8 +95,9 @@ model Section {
   order        Int      @default(0)
   active       Boolean  @default(true)
 
-  posts  Post[]
-  events Event[]
+  posts    Post[]
+  events   Event[]
+  managers User[] @relation("SectionManagers")
 }
 
 // ─────────────────────────── Actualidad ───────────────────────────
@@ -134,8 +138,47 @@ model Event {
   section              Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
   published            Boolean   @default(true)
   createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now()) @updatedAt
+
+  // ── Microweb del evento (pestañas). Vacío = pestaña oculta ──
+  subtitle         String?  // Lema corto bajo el título
+  heroImage        String?  // Imagen de cabecera de la microweb
+  highlights       String?  // Líneas "Etiqueta | Valor" para la portada
+  intro            String?  // Markdown de bienvenida (Inicio)
+  presentation     String?  // Markdown (Presentación)
+  accommodation    String?  // Markdown (Alojamiento)
+  accommodations   String?  // Líneas "Nombre | Localidad | Precio | Contacto | Notas"
+  program          String?  // Texto estructurado: "## Día" + "HH:MM | Título | Lugar | Notas"
+  registrationInfo String?  // Markdown (Inscripciones)
+  contactName      String?
+  contactEmail     String?
+  contactPhone     String?
+  contactInfo      String?  // Markdown adicional (Contacto)
+  customHtml       String?  // JSON { pestaña: html } HTML libre por pestaña (solo administradores)
 
   registrations EventRegistration[]
+  stages        EventStage[]
+}
+
+// Etapa de un evento (marcha, travesía, carrera por etapas…)
+model EventStage {
+  id          String   @id @default(cuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  order       Int      @default(0)
+  name        String
+  date        DateTime?
+  startTime   String?  // "08:30"
+  startPlace  String?
+  endPlace    String?
+  distanceKm  Float?
+  elevationM  Int?     // desnivel positivo
+  description String?  // Markdown
+  schedule    String?  // Líneas "HH:MM | Descripción | Lugar"
+  gpxName     String?  // nombre del archivo subido
+  gpxData     String?  // contenido GPX
+  gpxStats    String?  // JSON calculado: { points:[[lat,lon,ele]…], distanceKm, elevationGain, bounds }
+  createdAt   DateTime @default(now())
 }
 
 enum RegistrationStatus {

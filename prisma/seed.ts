@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { EVENT_TEMPLATES, parseGpx } from "../src/lib/event-page";
 
 const prisma = new PrismaClient();
 const year = new Date().getFullYear();
@@ -96,7 +99,6 @@ async function main() {
     { slug: "torneo-rugby-bomberos-madrid", title: "VII Torneo de Rugby Bomberos Madrid", section: "rugby", days: 25, hour: 9, location: "Campo de rugby de Vallecas", priceCents: 1500, memberPriceCents: 0, capacity: 200, description: "Torneo de rugby a 15 entre cuerpos de bomberos de toda España. Entrada con tercer tiempo incluido: comida, bebida y camiseta conmemorativa.\n\n## Programa\n\n- 09:00 Recepción de equipos\n- 10:00 Fase de grupos\n- 15:00 Semifinales y final\n- 18:00 Tercer tiempo en el Parque Central" },
     { slug: "carrera-popular-bomberos-madrid", title: "Carrera Popular Bomberos de Madrid 10K", section: "atletismo", days: 40, hour: 9, location: "Salida en Plaza de Cibeles", priceCents: 1200, memberPriceCents: 800, capacity: 1500, description: "Carrera solidaria de 10 kilómetros por el centro de Madrid. Los beneficios se destinan a la Fundación Bomberos. Incluye dorsal con chip, camiseta técnica y avituallamiento." },
     { slug: "travesia-sierra-guadarrama", title: "Travesía Bomberos de la Sierra de Guadarrama", section: "montana", days: 55, hour: 7, location: "Puerto de Navacerrada", priceCents: 2500, memberPriceCents: 1500, capacity: 80, description: "Travesía de 28 km por la Cuerda Larga con guías de montaña del club. Nivel medio-alto. Incluye seguro, transporte de vuelta y comida en Cercedilla." },
-    { slug: "marcha-cicloturista-bomberos", title: "Marcha Cicloturista Bomberos Madrid", section: "ciclismo", days: 70, hour: 8, location: "Parque Central de Bomberos", priceCents: 2000, memberPriceCents: 1200, capacity: 300, description: "Marcha de 120 km por la sierra oeste con dos puertos puntuables. Avituallamientos, coche escoba y paella final." },
     { slug: "torneo-padel-familias", title: "Torneo de Pádel de Familias", section: "padel", days: 18, hour: 10, location: "Pistas de pádel Fuencarral", priceCents: 1000, memberPriceCents: 500, capacity: 64, description: "Torneo por parejas abierto a socios, familiares y amigos. Categorías A, B y mixta. Premios y comida de clausura." },
     { slug: "gala-anual-club", title: "Gala anual del Club Deportivo Bomberos Madrid", days: 90, hour: 20, location: "Salón de actos del Parque Central", priceCents: 3500, memberPriceCents: 2500, capacity: 250, description: "Cena de gala con entrega de premios a los deportistas de la temporada, homenaje a los socios veteranos y música en directo." },
   ];
@@ -104,6 +106,54 @@ async function main() {
     const data = { title: e.title, description: e.description, startsAt: d(e.days, e.hour), location: e.location, priceCents: e.priceCents, memberPriceCents: e.memberPriceCents, capacity: e.capacity, registrationDeadline: d(e.days - 2, 23), sectionId: e.section ? sectionMap[e.section] : null, coverImage: `/images/events/${e.slug}.svg`, published: true };
     await prisma.event.upsert({ where: { slug: e.slug }, update: data, create: { slug: e.slug, ...data } });
   }
+
+  // ─── Marcha Ciclista Bomberos: evento con microweb completa (plantilla) ───
+  const tpl = EVENT_TEMPLATES.find((t) => t.key === "marcha-ciclista")!;
+  const marchaData = {
+    title: "Marcha Ciclista Bomberos",
+    description: "Dos etapas cicloturistas por la Sierra de Guadarrama con avituallamientos, coche escoba, noche de convivencia en Cercedilla y maillot conmemorativo.",
+    startsAt: d(39, 8),
+    endsAt: d(40, 16),
+    location: "Parque Central de Bomberos, Madrid",
+    priceCents: 6500,
+    memberPriceCents: 4500,
+    capacity: 150,
+    registrationDeadline: d(32, 23),
+    sectionId: sectionMap.ciclismo,
+    coverImage: "/images/events/marcha-ciclista-bomberos.svg",
+    heroImage: "/images/events/marcha-ciclista-bomberos.svg",
+    published: true,
+    contactName: "Sección de ciclismo · Pablo Iglesias",
+    contactEmail: "ciclismo@cdbomberosmadrid.es",
+    contactPhone: "+34 600 000 000",
+    ...tpl.fields,
+  };
+  const marcha = await prisma.event.upsert({ where: { slug: "marcha-ciclista-bomberos" }, update: marchaData, create: { slug: "marcha-ciclista-bomberos", ...marchaData } });
+  await prisma.eventStage.deleteMany({ where: { eventId: marcha.id } });
+  const gpxFiles = ["etapa-1-madrid-cercedilla.gpx", "etapa-2-cercedilla-madrid.gpx"];
+  let totalKm = 0;
+  let totalEle = 0;
+  for (const [i, st] of tpl.stages.entries()) {
+    const gpxData = readFileSync(join(__dirname, "gpx", gpxFiles[i]), "utf8");
+    const stats = parseGpx(gpxData)!;
+    totalKm += stats.distanceKm;
+    totalEle += stats.elevationGain;
+    await prisma.eventStage.create({
+      data: { eventId: marcha.id, order: i, name: st.name, date: d(39 + i, 8), startTime: st.startTime, startPlace: st.startPlace, endPlace: st.endPlace, distanceKm: stats.distanceKm, elevationM: stats.elevationGain, description: st.description, schedule: st.schedule, gpxName: gpxFiles[i], gpxData, gpxStats: JSON.stringify(stats) },
+    });
+  }
+  await prisma.event.update({
+    where: { id: marcha.id },
+    data: { highlights: tpl.fields.highlights.replace(/Recorrido \|.*/, `Recorrido | 2 etapas · ${Math.round(totalKm)} km · ${totalEle.toLocaleString("es-ES")} m+`) },
+  });
+
+  // Responsable de la sección de ciclismo (puede crear noticias y eventos de su sección)
+  await prisma.user.upsert({
+    where: { email: "ciclismo@demo.es" },
+    update: { managedSectionId: sectionMap.ciclismo },
+    create: { name: "Pablo Iglesias", email: "ciclismo@demo.es", passwordHash: await bcrypt.hash("Ciclismo1234!", 12), role: "SOCIO", isFirefighter: true, managedSectionId: sectionMap.ciclismo },
+  });
+  await prisma.event.deleteMany({ where: { slug: "marcha-cicloturista-bomberos" } });
 
   // ─── Tienda ───
   const sizes = ["S", "M", "L", "XL", "XXL"];
@@ -133,6 +183,8 @@ async function main() {
   console.log(`   Admin:        ${adminEmail} / ${adminPassword}`);
   console.log("   Socio demo:   socio@demo.es / Socio1234!");
   console.log("   Participante: participante@demo.es / Participante1234!");
+  console.log("   Resp. ciclismo: ciclismo@demo.es / Ciclismo1234!  → /admin/eventos");
+  console.log("   Microweb demo: /marcha-ciclista-bomberos");
 }
 
 main()

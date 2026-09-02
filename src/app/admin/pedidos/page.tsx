@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Table, th, td, smallInput, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime, formatPrice } from "@/lib/utils";
@@ -7,6 +8,7 @@ import { updateOrderStatusAction } from "@/actions/admin";
 const labels: Record<string, string> = { PENDING: "Pendiente", PAID: "Pagado", SHIPPED: "Enviado", DELIVERED: "Entregado", CANCELLED: "Cancelado" };
 
 export default async function AdminOrders() {
+  await requireAdmin();
   const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" }, include: { items: true }, take: 200 });
   return (
     <>

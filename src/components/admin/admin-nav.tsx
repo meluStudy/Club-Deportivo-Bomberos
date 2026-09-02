@@ -7,13 +7,13 @@ import { cn } from "@/lib/utils";
 
 const icons: Record<string, React.ComponentType<LucideProps>> = { BarChart3, Users, ShoppingBag, Package, CalendarDays, Newspaper, MessageSquare, UserCog };
 
-export function AdminNav({ links }: { links: { href: string; label: string; icon: string }[] }) {
+export function AdminNav({ links, subtitle }: { links: { href: string; label: string; icon: string }[]; subtitle?: string }) {
   const pathname = usePathname();
   return (
     <aside className="border-b border-ink-200 bg-white lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
       <div className="px-4 py-4 lg:px-6 lg:py-6">
         <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-brand-600">Administración</p>
-        <p className="text-sm text-ink-500">CD Bomberos Madrid</p>
+        <p className="text-sm text-ink-500">{subtitle ?? "CD Bomberos Madrid"}</p>
       </div>
       <nav className="flex gap-1 overflow-x-auto px-2 pb-3 lg:flex-col lg:px-3" aria-label="Administración">
         {links.map((l) => {

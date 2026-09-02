@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/utils";
 import { markMessageReadAction } from "@/actions/admin";
 
 export default async function AdminMessages() {
+  await requireAdmin();
   const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
   return (
     <>

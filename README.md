@@ -29,6 +29,7 @@ Usuarios de prueba creados por el seed:
 | --- | --- | --- |
 | Administrador | `admin@cdbomberosmadrid.es` (o `ADMIN_EMAIL` del `.env`) | `Admin1234!` |
 | Socio con cuota activa | `socio@demo.es` | `Socio1234!` |
+| Responsable de la sección de ciclismo | `ciclismo@demo.es` | `Ciclismo1234!` |
 | Participante | `participante@demo.es` | `Participante1234!` |
 
 Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run db:studio` (explorador de datos), `npm run db:reset` (borra y vuelve a sembrar).
@@ -40,11 +41,12 @@ Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run d
 | `/` | Hero animado, últimas noticias, secciones, próximos eventos, cuotas de socio y productos destacados |
 | `/secciones`, `/secciones/[slug]` | Las 10 secciones (atletismo, fútbol, rugby, ciclismo, natación, triatlón, montaña, pádel, baloncesto, CrossFit) con horarios, técnico, noticias y eventos propios |
 | `/actualidad`, `/actualidad/[slug]` | Noticias con filtro por sección |
-| `/eventos`, `/eventos/[slug]` | Calendario, plazas, precio general y de socio, inscripción con pago |
+| `/eventos` | Calendario con plazas, precio general y de socio |
+| `/nombre-evento`, `/nombre-evento/etapas`… | **Microweb de cada evento** con pestañas Inicio, Presentación, Alojamiento, Programa, Etapas (GPX, mapa y perfil), Inscripciones y Contacto. Las pestañas vacías no se muestran |
 | `/tienda`, `/tienda/[slug]`, `/checkout` | Catálogo por categorías, tallas y colores con stock, carrito lateral, recogida o envío, pago |
 | `/socios` | Ventajas, modalidades de cuota y alta online |
 | `/cuenta` | Carné digital de socio, renovación de temporada, inscripciones y pedidos |
-| `/admin/*` | Resumen (recuento de socios por modalidad, ingresos, stock bajo), socios, tienda y stock, pedidos, eventos e inscritos, noticias, mensajes y usuarios |
+| `/admin/*` | Resumen (recuento de socios por modalidad, ingresos, stock bajo), socios, tienda y stock, pedidos, eventos con editor de microweb e inscritos, noticias, mensajes y usuarios |
 | `/contacto` | Formulario, datos, redes sociales y mapa |
 | `/legal/*` | Aviso legal, privacidad, cookies, términos y condiciones, envíos y devoluciones, estatutos |
 | `/login`, `/registro` | Cuentas de usuario |
@@ -53,7 +55,23 @@ Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run d
 
 - **Participante**: se crea al registrarse. Puede inscribirse en eventos y comprar.
 - **Socio**: al pagar la cuota anual el usuario pasa automáticamente a `SOCIO`, obtiene número de socio y carné digital, y se le aplican los precios de socio en tienda y eventos. La temporada es el año natural y la renovación se hace desde `/cuenta`.
-- **Administrador**: acceso a `/admin`. Se puede promover a cualquier usuario desde *Usuarios*.
+- **Responsable de sección**: cualquier usuario al que el administrador asigne una sección desde *Usuarios*. Entra en `/admin` y solo ve *Eventos* y *Noticias* de su sección: puede crear noticias, crear eventos desde plantilla y rellenar la microweb del evento (etapas y GPX incluidos). No accede a stock, pedidos, socios ni mensajes.
+- **Administrador**: acceso completo a `/admin`, incluido el stock de la tienda y el HTML libre de las microwebs. Se puede promover a cualquier usuario desde *Usuarios*.
+
+## Microweb de eventos
+
+Cada evento se publica en `/nombre-evento` con pestañas propias. Desde `/admin/eventos` se crea el evento eligiendo una plantilla (marcha ciclista por etapas, carrera popular o en blanco) y se abre el editor, que tiene una pestaña por sección de la microweb:
+
+- **Ficha**: título, URL, fechas, lugar, precios, plazas, imágenes y publicación (borrador visible solo para el panel).
+- **Inicio**: datos destacados (`Etiqueta | Valor`) y texto de bienvenida.
+- **Presentación** y **Alojamiento**: texto en markdown sencillo; alojamientos recomendados en líneas `Nombre | Localidad | Precio | Contacto | Notas`.
+- **Programa**: `## Título del día` seguido de líneas `Hora | Qué | Punto de encuentro | Notas`.
+- **Etapas**: una o varias etapas con fecha, salida, llegada, descripción, horario (`Hora | Qué | Lugar`) y archivo GPX. Al subir el GPX la web calcula distancia y desnivel, dibuja el mapa (OpenStreetMap) y el perfil de altimetría y ofrece la descarga.
+- **Inscripciones**: texto informativo; el panel de inscripción y pago se genera con los precios de la ficha.
+- **Contacto**: persona, correo y teléfono de la organización.
+- **Inscritos**: listado con estado de pago y observaciones.
+
+Las pestañas sin contenido no aparecen en la web pública. Los administradores globales pueden además añadir HTML libre al final de cada pestaña.
 
 ## Pagos con Stripe
 

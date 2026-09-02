@@ -139,7 +139,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                 {registrations.map((r) => (
                   <li key={r.id} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <Link href={`/eventos/${r.event.slug}`} className="font-semibold hover:text-brand-600">{r.event.title}</Link>
+                      <Link href={`/${r.event.slug}`} className="font-semibold hover:text-brand-600">{r.event.title}</Link>
                       <p className="flex items-center gap-1 text-sm text-ink-500"><CalendarDays className="size-3.5" /> {formatDate(r.event.startsAt, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
                     <div className="flex items-center gap-3">

@@ -35,7 +35,7 @@ export default async function EventsPage() {
             <ul className="divide-y divide-ink-100 rounded-2xl border border-ink-100">
               {past.map((e) => (
                 <li key={e.id}>
-                  <Link href={`/eventos/${e.slug}`} className="flex flex-col gap-1 px-5 py-4 transition hover:bg-ink-50 sm:flex-row sm:items-center sm:justify-between">
+                  <Link href={`/${e.slug}`} className="flex flex-col gap-1 px-5 py-4 transition hover:bg-ink-50 sm:flex-row sm:items-center sm:justify-between">
                     <span className="font-semibold">{e.title}</span>
                     <span className="text-sm text-ink-500">{formatDate(e.startsAt)} · {e.location}</span>
                   </Link>

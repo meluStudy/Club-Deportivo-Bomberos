@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Details, Table, th, td, smallInput, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, parseJson, sortVariants } from "@/lib/utils";
@@ -6,6 +7,7 @@ import { toggleProductAction, updateStockAction, upsertProductAction } from "@/a
 import { inputClass, textareaClass, Field } from "@/components/ui/form";
 
 export default async function AdminShop() {
+  await requireAdmin();
   const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" }, include: { variants: { orderBy: { sku: "asc" } } } });
 
   return (

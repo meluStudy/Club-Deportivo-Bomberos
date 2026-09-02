@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Stat, Table, th, td, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { currentSeason, formatDate, formatPrice } from "@/lib/utils";
@@ -7,6 +8,7 @@ import Link from "next/link";
 
 export default async function AdminMembers({ searchParams }: { searchParams: Promise<{ temporada?: string; estado?: string }> }) {
   const sp = await searchParams;
+  await requireAdmin();
   const season = Number(sp.temporada) || currentSeason();
   const status = sp.estado as "ACTIVE" | "PENDING" | "EXPIRED" | undefined;
   const [memberships, seasons, counts] = await Promise.all([

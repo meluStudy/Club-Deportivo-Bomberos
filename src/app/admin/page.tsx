@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Panel, Stat } from "@/components/admin/ui";
 import { currentSeason, formatDate, formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 export default async function AdminDashboard() {
+  await requireAdmin();
   const season = currentSeason();
   const [activeMembers, pendingMembers, lastSeason, byPlan, revenue, revenueByType, orders, pendingOrders, lowStock, upcomingEvents, unread, recentPayments, usersCount] = await Promise.all([
     prisma.membership.count({ where: { season, status: "ACTIVE" } }),

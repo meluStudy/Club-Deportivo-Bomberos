@@ -97,7 +97,39 @@ export async function requireAdmin() {
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") {
     const { redirect } = await import("next/navigation");
-    redirect(user ? "/cuenta" : "/login?next=/admin");
+    if (!user) redirect("/login?next=/admin");
+    const staff = await prisma.user.findUnique({ where: { id: user!.id }, select: { managedSectionId: true } });
+    redirect(staff?.managedSectionId ? "/admin/eventos" : "/cuenta");
   }
   return user!;
+}
+
+/**
+ * Personal con acceso al panel: administradores globales y responsables de sección.
+ * Devuelve el usuario con su sección gestionada (si la tiene).
+ */
+export async function requireStaff() {
+  const session = await getSession();
+  if (!session) {
+    const { redirect } = await import("next/navigation");
+    redirect("/login?next=/admin");
+  }
+  const user = await prisma.user.findUnique({
+    where: { id: session!.id },
+    select: { id: true, name: true, email: true, role: true, managedSectionId: true, managedSection: { select: { id: true, name: true, slug: true } } },
+  });
+  if (!user || (user.role !== "ADMIN" && !user.managedSectionId)) {
+    const { redirect } = await import("next/navigation");
+    redirect("/cuenta");
+  }
+  return user!;
+}
+
+export type StaffUser = Awaited<ReturnType<typeof requireStaff>>;
+
+export const isAdmin = (u: { role: Role }) => u.role === "ADMIN";
+
+/** Un responsable de sección solo puede tocar contenidos de su sección. */
+export function canManageSection(u: StaffUser, sectionId: string | null | undefined) {
+  return isAdmin(u) || (Boolean(u.managedSectionId) && u.managedSectionId === sectionId);
 }
