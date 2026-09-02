@@ -7,7 +7,7 @@ import { getPastEvents, getUpcomingEvents } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Eventos", description: "Calendario de eventos del Club Deportivo Bomberos Madrid: torneos, carreras, marchas y encuentros. Inscripción online." };
+export const metadata: Metadata = { title: "Eventos", description: "Calendario de eventos del Club Deportivo Bomberos de Madrid: torneos, carreras, marchas y encuentros. Inscripción online." };
 export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {

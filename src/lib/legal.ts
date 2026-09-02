@@ -1,8 +1,8 @@
-import { site } from "./site";
+import { fullAddress, site } from "./site";
 
 export type LegalPage = { slug: string; title: string; updated: string; content: string };
 
-const responsable = `**Responsable:** ${site.name}, CIF ${site.cif}, ${site.address}. Correo: ${site.email}.`;
+const responsable = `**Responsable:** ${site.legalName} (${site.name}), CIF ${site.cif}, con domicilio en ${fullAddress}. Correo electrónico: ${site.email}.`;
 
 export const legalPages: LegalPage[] = [
   {
@@ -15,7 +15,7 @@ En cumplimiento de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad d
 
 ${responsable}
 
-Entidad deportiva sin ánimo de lucro inscrita en el Registro de Entidades Deportivas de la Comunidad de Madrid.
+**Denominación oficial:** ${site.legalName}. Entidad deportiva sin ánimo de lucro inscrita en el Registro de Entidades Deportivas de la Comunidad de Madrid.
 
 ## 2. Objeto
 
@@ -185,11 +185,11 @@ Los reembolsos se realizan por el mismo medio de pago en un plazo máximo de 14 
     updated: "Aprobados en Asamblea General",
     content: `## Capítulo I. Denominación, fines y domicilio
 
-**Artículo 1.** El ${site.name} es una entidad deportiva sin ánimo de lucro constituida al amparo de la Ley 15/1994, de 28 de diciembre, del Deporte de la Comunidad de Madrid.
+**Artículo 1.** El ${site.legalName} es una entidad deportiva sin ánimo de lucro constituida al amparo de la Ley 15/1994, de 28 de diciembre, del Deporte de la Comunidad de Madrid.
 
 **Artículo 2.** Son fines del club el fomento y la práctica de la actividad física y deportiva entre los miembros del Cuerpo de Bomberos del Ayuntamiento de Madrid, sus familiares y la ciudadanía en general, así como la promoción de los valores de compañerismo, esfuerzo y servicio público.
 
-**Artículo 3.** El domicilio social se fija en ${site.address}.
+**Artículo 3.** El domicilio social se fija en ${fullAddress}.
 
 ## Capítulo II. Socios
 

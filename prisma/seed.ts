@@ -14,10 +14,10 @@ const d = (offsetDays: number, hour = 10) => {
 };
 
 async function main() {
-  console.log("🌱 Sembrando datos del Club Deportivo Bomberos Madrid…");
+  console.log("🌱 Sembrando datos del Club Deportivo Bomberos de Madrid…");
 
   // ─── Usuarios ───
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@cdbomberosmadrid.es";
+  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@clubdeportivobomberos.es";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "Admin1234!";
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -72,17 +72,17 @@ async function main() {
   for (const [i, s] of sections.entries()) {
     const row = await prisma.section.upsert({
       where: { slug: s.slug },
-      update: { name: s.name, icon: s.icon, tagline: s.tagline, description: s.description, schedule: JSON.stringify(s.schedule), coach: s.coach, order: i, coverImage: `/images/sections/${s.slug}.svg`, contactEmail: `${s.slug}@cdbomberosmadrid.es` },
-      create: { slug: s.slug, name: s.name, icon: s.icon, tagline: s.tagline, description: s.description, schedule: JSON.stringify(s.schedule), coach: s.coach, order: i, coverImage: `/images/sections/${s.slug}.svg`, contactEmail: `${s.slug}@cdbomberosmadrid.es` },
+      update: { name: s.name, icon: s.icon, tagline: s.tagline, description: s.description, schedule: JSON.stringify(s.schedule), coach: s.coach, order: i, coverImage: `/images/sections/${s.slug}.svg`, contactEmail: `${s.slug}@clubdeportivobomberos.es` },
+      create: { slug: s.slug, name: s.name, icon: s.icon, tagline: s.tagline, description: s.description, schedule: JSON.stringify(s.schedule), coach: s.coach, order: i, coverImage: `/images/sections/${s.slug}.svg`, contactEmail: `${s.slug}@clubdeportivobomberos.es` },
     });
     sectionMap[s.slug] = row.id;
   }
 
   // ─── Noticias ───
   const posts = [
-    { slug: "campeonato-espana-bomberos-atletismo", title: "El club brilla en el Campeonato de España de Bomberos de Atletismo", excerpt: "Siete medallas y récord de participación para nuestra sección de atletismo en Valencia.", section: "atletismo", featured: true, days: -3, content: "La sección de atletismo del Club Deportivo Bomberos Madrid regresó de Valencia con **siete medallas** en el Campeonato de España de Bomberos, tres de ellas de oro en 5.000 metros, 1.500 metros y relevo 4x400.\n\nEl equipo, formado por 24 atletas, logró además el récord de participación del club en una cita nacional.\n\n## Resultados destacados\n\n- Oro en 5.000 m masculino\n- Oro en 1.500 m femenino\n- Oro en relevo 4x400 mixto\n- Plata en salto de longitud\n\n> \"Este resultado es fruto de todo un año de trabajo en la pista de Vallehermoso\", destacó la entrenadora Marta Sánchez." },
+    { slug: "campeonato-espana-bomberos-atletismo", title: "El club brilla en el Campeonato de España de Bomberos de Atletismo", excerpt: "Siete medallas y récord de participación para nuestra sección de atletismo en Valencia.", section: "atletismo", featured: true, days: -3, content: "La sección de atletismo del Club Deportivo Bomberos de Madrid regresó de Valencia con **siete medallas** en el Campeonato de España de Bomberos, tres de ellas de oro en 5.000 metros, 1.500 metros y relevo 4x400.\n\nEl equipo, formado por 24 atletas, logró además el récord de participación del club en una cita nacional.\n\n## Resultados destacados\n\n- Oro en 5.000 m masculino\n- Oro en 1.500 m femenino\n- Oro en relevo 4x400 mixto\n- Plata en salto de longitud\n\n> \"Este resultado es fruto de todo un año de trabajo en la pista de Vallehermoso\", destacó la entrenadora Marta Sánchez." },
     { slug: "torneo-rugby-bomberos-madrid-2026", title: "Abiertas las inscripciones para el Torneo de Rugby Bomberos Madrid", excerpt: "La séptima edición reunirá a 12 equipos de cuerpos de bomberos de toda España en Vallecas.", section: "rugby", featured: true, days: -6, content: "El Torneo de Rugby Bomberos Madrid celebra su séptima edición el próximo mes con la participación confirmada de 12 equipos de cuerpos de bomberos de toda España y una selección invitada de Portugal.\n\nLas inscripciones para equipos ya están abiertas y el tercer tiempo se celebrará en el Parque Central con entrada libre para socios y familiares." },
-    { slug: "nueva-equipacion-oficial-2026", title: "Presentamos la nueva equipación oficial del club", excerpt: "Rojo y negro en un diseño renovado, ya disponible en la tienda oficial con descuento para socios.", featured: true, days: -10, content: "La nueva equipación del Club Deportivo Bomberos Madrid ya está disponible en nuestra tienda oficial. Un diseño que mantiene los colores rojo y negro del cuerpo con un patrón de franjas inspirado en las bandas reflectantes del uniforme de intervención.\n\nLos socios disfrutan de un **15% de descuento** en toda la colección." },
+    { slug: "nueva-equipacion-oficial-2026", title: "Presentamos la nueva equipación oficial del club", excerpt: "Rojo y negro en un diseño renovado, ya disponible en la tienda oficial con descuento para socios.", featured: true, days: -10, content: "La nueva equipación del Club Deportivo Bomberos de Madrid ya está disponible en nuestra tienda oficial. Un diseño que mantiene los colores rojo y negro del cuerpo con un patrón de franjas inspirado en las bandas reflectantes del uniforme de intervención.\n\nLos socios disfrutan de un **15% de descuento** en toda la colección." },
     { slug: "asamblea-general-ordinaria", title: "Convocatoria de Asamblea General Ordinaria", excerpt: "Se convoca a todos los socios a la asamblea anual donde se presentarán las cuentas y el plan deportivo.", days: -14, content: "La Junta Directiva convoca a todos los socios del club a la Asamblea General Ordinaria que se celebrará en el salón de actos del Parque Central de Bomberos.\n\n## Orden del día\n\n1. Lectura y aprobación del acta anterior\n2. Presentación de cuentas de la temporada\n3. Plan deportivo y presupuesto\n4. Ruegos y preguntas" },
     { slug: "ciclismo-quebrantahuesos", title: "Quince socios completan la Quebrantahuesos", excerpt: "La sección de ciclismo vuelve a plantar la bandera del club en Sabiñánigo.", section: "ciclismo", days: -20, content: "Quince miembros de la sección de ciclismo completaron los 200 kilómetros y 3.500 metros de desnivel de la Quebrantahuesos, la marcha cicloturista más emblemática de España.\n\nEl grupo cerró la temporada de grandes marchas con un balance de más de 40 finishers en Perico Delgado, Quebrantahuesos y La Indomable." },
     { slug: "escuela-natacion-aguas-abiertas", title: "Arranca la escuela de aguas abiertas en el pantano de San Juan", excerpt: "Nuevo grupo de iniciación con sesiones quincenales de mayo a septiembre.", section: "natacion", days: -28, content: "La sección de natación pone en marcha su escuela de aguas abiertas para socios de todos los niveles. Sesiones quincenales en el pantano de San Juan con monitores titulados en salvamento acuático." },
@@ -100,7 +100,7 @@ async function main() {
     { slug: "carrera-popular-bomberos-madrid", title: "Carrera Popular Bomberos de Madrid 10K", section: "atletismo", days: 40, hour: 9, location: "Salida en Plaza de Cibeles", priceCents: 1200, memberPriceCents: 800, capacity: 1500, description: "Carrera solidaria de 10 kilómetros por el centro de Madrid. Los beneficios se destinan a la Fundación Bomberos. Incluye dorsal con chip, camiseta técnica y avituallamiento." },
     { slug: "travesia-sierra-guadarrama", title: "Travesía Bomberos de la Sierra de Guadarrama", section: "montana", days: 55, hour: 7, location: "Puerto de Navacerrada", priceCents: 2500, memberPriceCents: 1500, capacity: 80, description: "Travesía de 28 km por la Cuerda Larga con guías de montaña del club. Nivel medio-alto. Incluye seguro, transporte de vuelta y comida en Cercedilla." },
     { slug: "torneo-padel-familias", title: "Torneo de Pádel de Familias", section: "padel", days: 18, hour: 10, location: "Pistas de pádel Fuencarral", priceCents: 1000, memberPriceCents: 500, capacity: 64, description: "Torneo por parejas abierto a socios, familiares y amigos. Categorías A, B y mixta. Premios y comida de clausura." },
-    { slug: "gala-anual-club", title: "Gala anual del Club Deportivo Bomberos Madrid", days: 90, hour: 20, location: "Salón de actos del Parque Central", priceCents: 3500, memberPriceCents: 2500, capacity: 250, description: "Cena de gala con entrega de premios a los deportistas de la temporada, homenaje a los socios veteranos y música en directo." },
+    { slug: "gala-anual-club", title: "Gala anual del Club Deportivo Bomberos de Madrid", days: 90, hour: 20, location: "Salón de actos del Parque Central", priceCents: 3500, memberPriceCents: 2500, capacity: 250, description: "Cena de gala con entrega de premios a los deportistas de la temporada, homenaje a los socios veteranos y música en directo." },
   ];
   for (const e of events) {
     const data = { title: e.title, description: e.description, startsAt: d(e.days, e.hour), location: e.location, priceCents: e.priceCents, memberPriceCents: e.memberPriceCents, capacity: e.capacity, registrationDeadline: d(e.days - 2, 23), sectionId: e.section ? sectionMap[e.section] : null, coverImage: `/images/events/${e.slug}.svg`, published: true };
@@ -124,7 +124,7 @@ async function main() {
     heroImage: "/images/events/marcha-ciclista-bomberos.svg",
     published: true,
     contactName: "Sección de ciclismo · Pablo Iglesias",
-    contactEmail: "ciclismo@cdbomberosmadrid.es",
+    contactEmail: "ciclismo@clubdeportivobomberos.es",
     contactPhone: "+34 600 000 000",
     ...tpl.fields,
   };

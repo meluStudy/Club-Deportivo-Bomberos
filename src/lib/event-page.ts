@@ -207,7 +207,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
     fields: {
       subtitle: "Dos días de pedales, compañerismo y sierra madrileña",
       highlights: "Fechas | 11 y 12 de octubre\nSalida | Parque Central de Bomberos, Madrid\nRecorrido | 2 etapas · 215 km · 3.900 m+\nNivel | Cicloturista con buena forma física\nPlazas | 150 participantes",
-      intro: "La **Marcha Ciclista Bomberos** es la cita cicloturista del Club Deportivo Bomberos Madrid: dos etapas por la Sierra de Guadarrama, con avituallamientos, coche escoba, asistencia mecánica y una noche de convivencia en la sierra.\n\nAbierta a socios, bomberos de otros cuerpos, familiares y amigos. Ritmo de marcha, no competitivo, con grupos por nivel.",
+      intro: "La **Marcha Ciclista Bomberos** es la cita cicloturista del Club Deportivo Bomberos de Madrid: dos etapas por la Sierra de Guadarrama, con avituallamientos, coche escoba, asistencia mecánica y una noche de convivencia en la sierra.\n\nAbierta a socios, bomberos de otros cuerpos, familiares y amigos. Ritmo de marcha, no competitivo, con grupos por nivel.",
       presentation: "## Una marcha con espíritu de parque\n\nNacida en 2018 como salida interna de la sección de ciclismo, la marcha se ha convertido en un encuentro anual de bomberos ciclistas de toda España. Dos etapas de montaña, un ritmo de marcha y muchas historias que contar en el avituallamiento.\n\n## Qué incluye la inscripción\n\n- Maillot conmemorativo de la edición\n- Avituallamientos sólidos y líquidos en cada etapa\n- Coche escoba y asistencia mecánica\n- Seguro de accidentes y responsabilidad civil\n- Cena de convivencia del sábado y desayuno del domingo\n- Transporte de equipaje entre etapas\n- Diploma finisher y foto de grupo\n\n## Reglamento básico\n\n- Casco obligatorio en todo momento.\n- Se respetan las normas de circulación: la marcha discurre por carreteras abiertas al tráfico.\n- Ritmo de marcha: los grupos se reagrupan en los puntos indicados.\n- La organización puede cerrar el control a la hora prevista por seguridad.",
       accommodation: "## Noche del sábado en la sierra\n\nLa organización ha bloqueado plazas en alojamientos de Cercedilla y Navacerrada con precios especiales para participantes. Reserva directamente con el alojamiento indicando **Marcha Ciclista Bomberos**. Se recomienda reservar antes del 30 de septiembre.\n\nEl transporte del equipaje entre el Parque Central y el alojamiento está incluido en la inscripción.",
       accommodations: "Hotel Sierra Cercedilla | Cercedilla | 55 € hab. doble con desayuno | 918 000 000 | Guardabicis vigilado\nAlbergue Peñalara | Navacerrada | 28 € por persona | reservas@albergue.es | Literas en habitaciones de 4\nHostal Los Ángeles | Cercedilla | 45 € hab. doble | 918 000 001 | A 300 m del punto de salida",
@@ -227,7 +227,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
     fields: {
       subtitle: "Corre con los bomberos de Madrid",
       highlights: "Fecha | Por confirmar\nSalida | Por confirmar\nDistancia | 10 km\nDorsales | Hasta agotar",
-      intro: "Carrera popular organizada por el Club Deportivo Bomberos Madrid. Abierta a todos los públicos.",
+      intro: "Carrera popular organizada por el Club Deportivo Bomberos de Madrid. Abierta a todos los públicos.",
       presentation: "## La carrera\n\nDescribe aquí el recorrido, el fin solidario y qué incluye el dorsal (camiseta, chip, avituallamiento, seguro).",
       accommodation: "",
       accommodations: "",

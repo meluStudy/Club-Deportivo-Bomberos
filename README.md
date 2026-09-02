@@ -1,6 +1,6 @@
-# Club Deportivo Bomberos Madrid · Web oficial
+# Club Deportivo Bomberos de Madrid · Web oficial
 
-Web moderna del Club Deportivo Bomberos Madrid, inspirada en los grandes clubes polideportivos: portada con actualidad, secciones deportivas, eventos con inscripción y pago, tienda oficial con control de stock, área de socios con cuota anual y renovación, panel de administración y páginas legales.
+Web del **Club Agrupación Deportiva Atlética Bomberos de Madrid** (CIF G-79411666), con domicilio en el Parque de Bomberos nº 8, Calle Pío Felipe s/n, 28038 Madrid. Inspirada en los grandes clubes polideportivos: portada con actualidad, secciones deportivas, eventos con inscripción y pago, tienda oficial con control de stock, área de socios con cuota anual y renovación, panel de administración y páginas legales.
 
 ## Stack
 
@@ -27,7 +27,7 @@ Usuarios de prueba creados por el seed:
 
 | Rol | Correo | Contraseña |
 | --- | --- | --- |
-| Administrador | `admin@cdbomberosmadrid.es` (o `ADMIN_EMAIL` del `.env`) | `Admin1234!` |
+| Administrador | `admin@clubdeportivobomberos.es` (o `ADMIN_EMAIL` del `.env`) | `Admin1234!` |
 | Socio con cuota activa | `socio@demo.es` | `Socio1234!` |
 | Responsable de la sección de ciclismo | `ciclismo@demo.es` | `Ciclismo1234!` |
 | Participante | `participante@demo.es` | `Participante1234!` |
@@ -81,11 +81,40 @@ Las pestañas sin contenido no aparecen en la web pública. Los administradores 
 
 Sin claves, todos los cobros (cuotas, inscripciones y pedidos) pasan por `/pago/demo`, una pantalla que simula el resultado del pago. Es útil para probar, pero **no debe usarse en producción**.
 
-## Logos e imágenes
+## Identidad de marca
 
-Las imágenes actuales son marcadores de posición en SVG. Para sustituirlas:
+El logotipo del club se ha **vectorizado a partir del archivo original** (`public/images/marca/logo-original.jpg`, un JPEG de 296 × 170 px con el fondo aplanado a negro). El resultado es nítido a cualquier tamaño y pesa lo mismo en una tarjeta de visita que en una valla.
 
-- Escudo del club: `public/images/logo.svg` (se usa en cabecera, footer y páginas de acceso).
+| Archivo | Uso |
+| --- | --- |
+| `public/images/marca/logo.svg` | Logotipo completo para fondos claros (cabecera, documentos) |
+| `public/images/marca/logo-inverso.svg` | Logotipo completo para fondos oscuros (pie de página, portadas) |
+| `public/images/marca/isotipo.svg` | Solo el corredor y la pista, sin tipografía |
+| `public/images/marca/isotipo-inverso.svg` | Isotipo para fondos oscuros |
+| `public/images/marca/icono.svg` | Icono de aplicación (mismo dibujo que el favicon) |
+| `public/images/marca/logo-original.jpg` | Archivo original recibido, guardado como referencia |
+
+Colores corporativos: rojo `#e10600`, negro `#0b0b0d` y azul del corredor `#131a8a`.
+
+### Favicon
+
+El logotipo completo no se lee a 16 píxeles, así que el favicon es una **adaptación**: pictograma del corredor en blanco sobre negro con la pista en rojo. Se sirve en todos los formatos que piden los navegadores y Google:
+
+| Archivo | Tamaño | Para qué |
+| --- | --- | --- |
+| `public/favicon.ico` | 16, 32 y 48 px | El que Google busca en la raíz del dominio para los resultados de búsqueda |
+| `public/icon.svg` | vectorial | Pestañas del navegador en pantallas de alta densidad |
+| `public/icon-192.png`, `public/icon-512.png` | 192 y 512 px | Instalación como aplicación y buscadores |
+| `public/icon-maskable-512.png` | 512 px | Icono adaptable de Android (con margen de recorte) |
+| `public/apple-icon.png` | 180 px | Pantalla de inicio de iPhone y iPad |
+| `public/images/og.png` | 1200 × 630 px | Vista previa al compartir el enlace en redes y WhatsApp |
+
+Para que el favicon salga en Google hace falta, además de los archivos: que el dominio esté publicado y accesible, que la web esté indexada y que la etiqueta `<link rel="icon">` apunte a una URL estable. Todo eso ya está en `src/app/layout.tsx`, junto con los datos estructurados de `src/components/structured-data.tsx` (ficha `SportsOrganization` con el nombre legal, el CIF, la dirección y el logotipo). Google puede tardar entre unos días y varias semanas en actualizarlo tras la publicación.
+
+### Otras imágenes
+
+Las fotografías siguen siendo marcadores de posición en SVG:
+
 - Portada: `public/images/hero.svg`.
 - Secciones: `public/images/sections/<slug>.svg` (puede ser `.jpg`/`.png` cambiando la ruta desde el seed o el panel).
 - Noticias, eventos y productos: se editan desde el panel de administración indicando la ruta o URL de la imagen.

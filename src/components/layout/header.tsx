@@ -44,7 +44,7 @@ export function Header({ user }: { user: SessionUser | null }) {
     <>
       <div className="bg-ink-950 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs sm:px-6 lg:px-8">
-          <p className="hidden font-display uppercase tracking-widest text-ink-300 sm:block">Club Deportivo Bomberos Madrid · Desde 1985</p>
+          <p className="hidden font-display uppercase tracking-widest text-ink-300 sm:block">Club Agrupación Deportiva Atlética Bomberos de Madrid · Desde 1985</p>
           <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
             <Link href="/socios" className="font-semibold text-brand-400 hover:text-white">
               Hazte socio →
@@ -70,7 +70,7 @@ export function Header({ user }: { user: SessionUser | null }) {
         )}
       >
         <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-          <Logo />
+          <Logo priority />
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Principal">
             {mainNav.map((item) => (

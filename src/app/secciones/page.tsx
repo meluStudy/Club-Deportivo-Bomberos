@@ -5,7 +5,7 @@ import { Stagger, StaggerItem } from "@/components/ui/reveal";
 import { SectionCard } from "@/components/cards";
 import { getSections } from "@/lib/data";
 
-export const metadata: Metadata = { title: "Secciones deportivas", description: "Todas las secciones deportivas del Club Deportivo Bomberos Madrid: atletismo, fútbol, rugby, ciclismo, natación y más." };
+export const metadata: Metadata = { title: "Secciones deportivas", description: "Todas las secciones deportivas del Club Deportivo Bomberos de Madrid: atletismo, fútbol, rugby, ciclismo, natación y más." };
 export const dynamic = "force-dynamic";
 
 export default async function SectionsPage() {

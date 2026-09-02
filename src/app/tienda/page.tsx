@@ -8,7 +8,7 @@ import { getActiveMembership, getProducts } from "@/lib/data";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Tienda oficial", description: "Equipación oficial, ropa y accesorios del Club Deportivo Bomberos Madrid. Descuento para socios." };
+export const metadata: Metadata = { title: "Tienda oficial", description: "Equipación oficial, ropa y accesorios del Club Deportivo Bomberos de Madrid. Descuento para socios." };
 export const dynamic = "force-dynamic";
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {

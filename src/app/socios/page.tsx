@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { joinMembershipAction } from "@/actions/membership";
 import { formatPrice, parseJson, cn, currentSeason } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Hazte socio", description: "Únete al Club Deportivo Bomberos Madrid. Cuotas anuales, ventajas y alta online con pago seguro." };
+export const metadata: Metadata = { title: "Hazte socio", description: "Únete al Club Deportivo Bomberos de Madrid. Cuotas anuales, ventajas y alta online con pago seguro." };
 export const dynamic = "force-dynamic";
 
 const perks = [

@@ -36,7 +36,7 @@ export async function joinMembershipAction(formData: FormData) {
     referenceId: membership.id,
     userId: user.id,
     email: user.email,
-    items: [{ name: `Cuota de socio ${season} · ${plan.name}`, description: "Club Deportivo Bomberos Madrid", amountCents: plan.priceCents, quantity: 1 }],
+    items: [{ name: `Cuota de socio ${season} · ${plan.name}`, description: "Club Deportivo Bomberos de Madrid", amountCents: plan.priceCents, quantity: 1 }],
     successPath: "/cuenta?pago=socio",
     cancelPath: "/socios?cancelado=1",
   });

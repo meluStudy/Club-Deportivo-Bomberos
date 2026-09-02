@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import { FacebookIcon, InstagramIcon, TikTokIcon, XIcon, YoutubeIcon } from "@/components/social-icons";
-import { legalNav, mainNav, site } from "@/lib/site";
+import { fullAddress, legalNav, mainNav, site } from "@/lib/site";
 import { Logo } from "./logo";
 
 const socials = [
@@ -38,7 +38,7 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
         <div className="lg:col-span-4">
           <Logo light />
           <p className="mt-5 max-w-sm text-sm leading-relaxed">
-            Club deportivo del Cuerpo de Bomberos del Ayuntamiento de Madrid. Deporte, compañerismo y compromiso con la ciudad desde {site.founded}.
+            Club Agrupación Deportiva Atlética Bomberos de Madrid. Deporte, compañerismo y compromiso con la ciudad desde {site.founded}.
           </p>
           <ul className="mt-6 flex gap-3">
             {socials.map(({ href, label, Icon }) => (
@@ -85,7 +85,7 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
         <FooterCol title="Contacto" className="lg:col-span-2">
           <li className="flex items-start gap-2">
             <MapPin className="mt-0.5 size-4 shrink-0 text-brand-500" />
-            <span>{site.address}</span>
+            <span>{fullAddress}</span>
           </li>
           <li className="flex items-center gap-2">
             <Mail className="size-4 shrink-0 text-brand-500" />
@@ -105,7 +105,7 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs sm:flex-row sm:px-6 lg:px-8">
           <p>
-            © {new Date().getFullYear()} {site.name}. CIF {site.cif}. Todos los derechos reservados.
+            © {new Date().getFullYear()} {site.legalName}. CIF {site.cif}. Todos los derechos reservados.
           </p>
           <p className="text-ink-500">Entidad deportiva sin ánimo de lucro inscrita en el Registro de Entidades Deportivas de la Comunidad de Madrid.</p>
         </div>

@@ -50,7 +50,7 @@ export default async function PostPage({ params }: Props) {
         <Reveal className="lg:col-span-8">
           <Markdown content={post.content} className="text-lg" />
           <div className="mt-10 flex items-center justify-between border-t border-ink-100 pt-6 text-sm text-ink-500">
-            <span>{post.author?.name ? `Publicado por ${post.author.name}` : "Club Deportivo Bomberos Madrid"}</span>
+            <span>{post.author?.name ? `Publicado por ${post.author.name}` : "Club Deportivo Bomberos de Madrid"}</span>
             <span className="inline-flex items-center gap-2"><Share2 className="size-4" /> Compartir</span>
           </div>
         </Reveal>

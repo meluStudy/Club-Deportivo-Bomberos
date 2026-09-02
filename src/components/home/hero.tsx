@@ -41,7 +41,7 @@ export function Hero() {
           className="mb-4 inline-flex items-center gap-3 font-display text-sm font-semibold uppercase tracking-[0.3em] text-brand-400"
         >
           <span className="h-0.5 w-10 bg-brand-500" aria-hidden />
-          Club Deportivo Bomberos Madrid
+          Club Deportivo Bomberos de Madrid
         </motion.p>
         <h1 className="max-w-5xl text-6xl font-extrabold uppercase leading-[0.9] sm:text-7xl lg:text-8xl xl:text-[7.5rem]">
           {["Fuego", "en las", "venas."].map((word, i) => (

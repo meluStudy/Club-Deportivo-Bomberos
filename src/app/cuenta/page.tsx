@@ -71,7 +71,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <div className="relative">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-brand-400">Club Deportivo Bomberos Madrid</p>
+                  <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-brand-400">Club Deportivo Bomberos de Madrid</p>
                   <h2 className="mt-2 text-3xl font-extrabold uppercase leading-none">{membership ? "Carné de socio" : "Sin cuota activa"}</h2>
                 </div>
                 {membership && <BadgeCheck className="size-8 text-brand-500" />}

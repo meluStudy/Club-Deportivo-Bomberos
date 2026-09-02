@@ -1,13 +1,24 @@
 export const site = {
-  name: "Club Deportivo Bomberos Madrid",
-  shortName: "CD Bomberos Madrid",
+  /** Nombre comercial, el que aparece en el logotipo. */
+  name: "Club Deportivo Bomberos de Madrid",
+  shortName: "CD Bomberos de Madrid",
+  /** Denominación oficial inscrita en el registro de entidades deportivas. */
+  legalName: "Club Agrupación Deportiva Atlética Bomberos de Madrid",
   description:
-    "Club deportivo del Cuerpo de Bomberos del Ayuntamiento de Madrid. Atletismo, fútbol, rugby, ciclismo, natación y muchas más secciones. Noticias, eventos, tienda oficial y área de socios.",
+    "Club Agrupación Deportiva Atlética Bomberos de Madrid. Atletismo, fútbol, rugby, ciclismo, natación y muchas más secciones. Noticias, eventos, tienda oficial y área de socios.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  email: "info@cdbomberosmadrid.es",
+  email: "info@clubdeportivobomberos.es",
   phone: "+34 900 000 000",
-  address: "Parque Central de Bomberos, C/ Imperial 10, 28005 Madrid",
-  cif: "G-00000000",
+  address: {
+    line: "Parque de Bomberos nº 8, Calle Pío Felipe s/n",
+    postalCode: "28038",
+    city: "Madrid",
+    country: "España",
+    /** Coordenadas aproximadas de la calle Pío Felipe (Puente de Vallecas). */
+    lat: 40.3879,
+    lng: -3.6534,
+  },
+  cif: "G-79411666",
   social: {
     instagram: "https://instagram.com/cdbomberosmadrid",
     twitter: "https://x.com/cdbomberosmadrid",
@@ -17,6 +28,9 @@ export const site = {
   },
   founded: 1985,
 };
+
+/** Dirección en una línea, para pies de página y textos legales. */
+export const fullAddress = `${site.address.line}, ${site.address.postalCode} ${site.address.city}`;
 
 export const mainNav = [
   { href: "/", label: "Inicio" },

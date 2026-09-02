@@ -7,7 +7,7 @@ import { PostCard } from "@/components/cards";
 import { getPosts, getSections } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Actualidad", description: "Noticias, resultados y convocatorias del Club Deportivo Bomberos Madrid." };
+export const metadata: Metadata = { title: "Actualidad", description: "Noticias, resultados y convocatorias del Club Deportivo Bomberos de Madrid." };
 export const dynamic = "force-dynamic";
 
 export default async function NewsPage({ searchParams }: { searchParams: Promise<{ seccion?: string }> }) {
@@ -16,7 +16,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <PageHero eyebrow="Actualidad" title="Noticias del club" description="Resultados, crónicas, convocatorias y todo lo que pasa en el Club Deportivo Bomberos Madrid." />
+      <PageHero eyebrow="Actualidad" title="Noticias del club" description="Resultados, crónicas, convocatorias y todo lo que pasa en el Club Deportivo Bomberos de Madrid." />
       <Container className="py-12">
         <nav className="mb-10 flex gap-2 overflow-x-auto pb-2" aria-label="Filtrar por sección">
           <FilterChip href="/actualidad" active={!seccion}>Todas</FilterChip>
