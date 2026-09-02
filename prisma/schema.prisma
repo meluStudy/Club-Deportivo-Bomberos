@@ -1,0 +1,269 @@
+// Esquema de datos del Club Deportivo Bomberos Madrid
+// Desarrollo: SQLite. Producción: cambiar provider a "postgresql" y DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Usuarios y roles ───────────────────────────
+
+enum Role {
+  ADMIN        // Administrador del club
+  SOCIO        // Socio del club
+  PARTICIPANTE // Usuario registrado para inscribirse a eventos / comprar
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(PARTICIPANTE)
+  phone         String?
+  dni           String?
+  birthDate     DateTime?
+  isFirefighter Boolean  @default(false) // Bombero del Ayuntamiento de Madrid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships   Membership[]
+  registrations EventRegistration[]
+  orders        Order[]
+  payments      Payment[]
+  posts         Post[]
+}
+
+// ─────────────────────────── Socios ───────────────────────────
+
+enum MembershipStatus {
+  PENDING  // Solicitud creada, pago pendiente
+  ACTIVE   // Cuota pagada, temporada en vigor
+  EXPIRED  // Temporada finalizada
+  CANCELLED
+}
+
+model Membership {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  memberNumber Int              @unique
+  season       Int              // Año de la temporada, p.ej. 2026
+  planId       String
+  plan         MembershipPlan   @relation(fields: [planId], references: [id])
+  status       MembershipStatus @default(PENDING)
+  amountCents  Int
+  paidAt       DateTime?
+  startsAt     DateTime
+  expiresAt    DateTime
+  createdAt    DateTime         @default(now())
+
+  @@unique([userId, season])
+}
+
+model MembershipPlan {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  description String
+  priceCents  Int
+  benefits    String       // JSON string[]
+  active      Boolean      @default(true)
+  memberships Membership[]
+}
+
+// ─────────────────────────── Secciones deportivas ───────────────────────────
+
+model Section {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  tagline      String
+  description  String
+  icon         String   // nombre de icono lucide
+  coverImage   String?
+  schedule     String   // JSON [{day, time, place}]
+  coach        String?
+  contactEmail String?
+  order        Int      @default(0)
+  active       Boolean  @default(true)
+
+  posts  Post[]
+  events Event[]
+}
+
+// ─────────────────────────── Actualidad ───────────────────────────
+
+model Post {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String
+  content     String    // Markdown simple
+  coverImage  String?
+  featured    Boolean   @default(false)
+  publishedAt DateTime?
+  sectionId   String?
+  section     Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ─────────────────────────── Eventos ───────────────────────────
+
+model Event {
+  id                   String    @id @default(cuid())
+  slug                 String    @unique
+  title                String
+  description          String
+  coverImage           String?
+  startsAt             DateTime
+  endsAt               DateTime?
+  location             String
+  priceCents           Int       @default(0)
+  memberPriceCents     Int?      // Precio para socios (opcional)
+  capacity             Int?
+  registrationDeadline DateTime?
+  sectionId            String?
+  section              Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  published            Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+
+  registrations EventRegistration[]
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model EventRegistration {
+  id        String             @id @default(cuid())
+  eventId   String
+  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    RegistrationStatus @default(PENDING)
+  amountCents Int
+  notes     String?
+  paidAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  @@unique([eventId, userId])
+}
+
+// ─────────────────────────── Tienda ───────────────────────────
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  category    String   // ropa, accesorios, equipacion...
+  priceCents  Int
+  memberPriceCents Int?
+  images      String   // JSON string[]
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  variants ProductVariant[]
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String  @unique
+  size      String? // S, M, L, XL...
+  color     String?
+  stock     Int     @default(0)
+
+  orderItems OrderItem[]
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email          String
+  fullName       String
+  phone          String?
+  status         OrderStatus @default(PENDING)
+  totalCents     Int
+  shippingMethod String      @default("recogida") // recogida | envio
+  address        String?     // JSON
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  items   OrderItem[]
+}
+
+model OrderItem {
+  id             String         @id @default(cuid())
+  orderId        String
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id])
+  productName    String
+  variantLabel   String
+  quantity       Int
+  unitPriceCents Int
+}
+
+// ─────────────────────────── Pagos ───────────────────────────
+
+enum PaymentType {
+  MEMBERSHIP
+  EVENT
+  ORDER
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type         PaymentType
+  referenceId  String        // id de Membership / EventRegistration / Order
+  amountCents  Int
+  currency     String        @default("eur")
+  status       PaymentStatus @default(PENDING)
+  provider     String        @default("stripe") // stripe | demo
+  providerRef  String?       @unique // stripe checkout session id
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+// ─────────────────────────── Contacto ───────────────────────────
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
