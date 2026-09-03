@@ -1,12 +1,13 @@
 // Esquema de datos del Club Deportivo Bomberos Madrid
-// Desarrollo: SQLite. Producción: cambiar provider a "postgresql" y DATABASE_URL.
+// PostgreSQL en desarrollo, test y producción: el mismo motor en los tres
+// entornos, para que las migraciones se comporten igual en todos.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

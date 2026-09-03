@@ -9,16 +9,20 @@ Web del **Club Agrupación Deportiva Atlética Bomberos de Madrid** (CIF G-79411
 | Framework | Next.js 16 (App Router, Server Actions) + React 19 + TypeScript |
 | Estilos | Tailwind CSS 4 · tipografías Barlow / Barlow Condensed · colores rojo `#e10600` y negro `#0b0b0d` |
 | Animaciones | Framer Motion (transiciones de página, botones, aparición al hacer scroll, menú móvil, carrito) |
-| Base de datos | Prisma ORM · SQLite en desarrollo · PostgreSQL en producción cambiando el `provider` |
+| Base de datos | PostgreSQL con Prisma ORM y migraciones versionadas (el mismo motor en desarrollo, pruebas y producción) |
 | Autenticación | Sesiones JWT firmadas (jose) en cookie httpOnly · contraseñas con bcrypt · roles `ADMIN`, `SOCIO`, `PARTICIPANTE` |
 | Pagos | Stripe Checkout + webhook. Sin claves de Stripe funciona en **modo demo** (pasarela simulada) |
 
 ## Puesta en marcha
 
+Hace falta Node 20.9 o superior y un PostgreSQL en marcha (local o en Docker):
+
 ```bash
+docker run -d --name cdb-postgres -e POSTGRES_PASSWORD=cdb -e POSTGRES_DB=cdb_dev -p 5432:5432 postgres:16
+
 npm install
-cp .env.example .env        # revisa AUTH_SECRET y las credenciales del admin
-npm run db:push             # crea la base de datos
+cp .env.example .env        # ajusta DATABASE_URL, AUTH_SECRET y el administrador
+npm run db:migrate          # crea las tablas aplicando las migraciones
 npm run db:seed             # carga secciones, noticias, eventos, productos y usuarios demo
 npm run dev                 # http://localhost:3000
 ```
@@ -32,7 +36,7 @@ Usuarios de prueba creados por el seed:
 | Responsable de la sección de ciclismo | `ciclismo@demo.es` | `Ciclismo1234!` |
 | Participante | `participante@demo.es` | `Participante1234!` |
 
-Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run db:studio` (explorador de datos), `npm run db:reset` (borra y vuelve a sembrar).
+Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run imagenes` (regenera las ilustraciones), `npm run db:studio` (explorador de datos), `npm run db:migrate` (crea una migración tras tocar el esquema), `npm run db:deploy` (aplica migraciones en el servidor) y `npm run db:reset` (borra y vuelve a sembrar).
 
 ## Mapa de la web
 
@@ -157,17 +161,21 @@ El script está en `scripts/generar-imagenes.ts` y los pictogramas en `src/lib/p
 
 ## Despliegue
 
-- **Vercel / Netlify / Railway**: `npm run build` ejecuta `prisma generate` y `next build`.
-- Para producción cambia `datasource db { provider = "postgresql" }` en `prisma/schema.prisma`, apunta `DATABASE_URL` a la base de datos y ejecuta `npm run db:migrate` (o `db:push`) y `npm run db:seed`.
-- Define `NEXT_PUBLIC_SITE_URL`, un `AUTH_SECRET` largo y aleatorio, y las claves de Stripe.
+La guía completa, con los dos entornos (pruebas y producción), el servidor, las
+bases de datos, las copias de seguridad y el flujo de trabajo, está en
+**[DESPLIEGUE.md](DESPLIEGUE.md)**.
+
+En resumen: cualquier servidor con Node 20.9+, PostgreSQL y un disco persistente
+para `UPLOADS_DIR`. El arranque en el servidor es `npm run db:deploy && npm start`.
 
 ## Estructura
 
 ```
-prisma/          esquema y seed
+prisma/          esquema, migraciones y seed
 src/app/         rutas (App Router)
 src/actions/     server actions: auth, socios, eventos, tienda, admin, contacto
-src/lib/         prisma, auth, pagos, stripe, datos, validaciones, textos legales, config del sitio
+src/lib/         prisma, auth, correo, límite de intentos, pagos, stripe, datos, CSV, validaciones, textos legales, config del sitio
+scripts/         generador de las ilustraciones
 src/components/  UI, layout (cabecera, footer, cookies), carrito, tienda, admin
 public/images/   logo y marcadores de posición
 ```
