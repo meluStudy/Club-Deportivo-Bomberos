@@ -46,17 +46,40 @@ Otros comandos: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run d
 | `/tienda`, `/tienda/[slug]`, `/checkout` | Catálogo por categorías, tallas y colores con stock, carrito lateral, recogida o envío, pago |
 | `/socios` | Ventajas, modalidades de cuota y alta online |
 | `/cuenta` | Carné digital de socio, renovación de temporada, inscripciones y pedidos |
-| `/admin/*` | Resumen (recuento de socios por modalidad, ingresos, stock bajo), socios, tienda y stock, pedidos, eventos con editor de microweb e inscritos, noticias, mensajes y usuarios |
+| `/admin/*` | Resumen, socios (con campaña de renovación), tienda y stock, pedidos, eventos con editor de microweb, noticias, mensajes, correos enviados y usuarios |
+| `/recuperar-contrasena`, `/restablecer-contrasena` | Recuperación de contraseña |
 | `/contacto` | Formulario, datos, redes sociales y mapa |
 | `/legal/*` | Aviso legal, privacidad, cookies, términos y condiciones, envíos y devoluciones, estatutos |
 | `/login`, `/registro` | Cuentas de usuario |
+
+## Cuentas y seguridad
+
+- **Recuperar contraseña**: desde la pantalla de acceso. Se envía un enlace de un solo uso que caduca en una hora; el token se guarda cifrado y nunca viaja en la base de datos en claro. Al cambiar la contraseña se levanta cualquier bloqueo por intentos fallidos.
+- **Límite de intentos**: cinco fallos de acceso por cuenta (y veinte por dirección de red) bloquean temporalmente, con espera creciente de 15 minutos a 4 horas. También están limitados el alta de cuentas, el formulario de contacto, las solicitudes de recuperación y las subidas de imágenes.
+
+## Correo saliente
+
+Los avisos (recuperación de contraseña y campañas de renovación) se envían con **Resend** (`RESEND_API_KEY`) o por **SMTP** del propio dominio (`SMTP_URL`). Si no hay ninguno configurado, la web sigue funcionando: los mensajes se registran en `/admin/correos`, donde el administrador puede ver el contenido y los enlaces. Así se puede probar todo antes de contratar el correo.
+
+## Listados en Excel
+
+Desde el panel se descargan en CSV, con separador de punto y coma y acentos correctos para abrirlos directamente en Excel en español:
+
+| Listado | Dónde |
+| --- | --- |
+| Inscritos de un evento (con los datos federativos) | Editor del evento → Inscritos |
+| Socios de una temporada | Socios |
+| Pedidos de la tienda | Pedidos y Tienda |
+| Usuarios registrados | Usuarios |
 
 ## Roles y flujos
 
 - **Participante**: se crea al registrarse. Puede inscribirse en eventos y comprar.
 - **Socio**: al pagar la cuota anual el usuario pasa automáticamente a `SOCIO`, obtiene número de socio y carné digital, y se le aplican los precios de socio en tienda y eventos. La temporada es el año natural y la renovación se hace desde `/cuenta`.
 - **Responsable de sección**: cualquier usuario al que el administrador asigne una sección desde *Usuarios*. Entra en `/admin` y solo ve *Eventos* y *Noticias* de su sección: puede crear noticias, crear eventos desde plantilla y rellenar la microweb del evento (etapas y GPX incluidos). No accede a stock, pedidos, socios ni mensajes.
-- **Administrador**: acceso completo a `/admin`, incluido el stock de la tienda y el HTML libre de las microwebs. Se puede promover a cualquier usuario desde *Usuarios*.
+- **Administrador**: acceso completo a `/admin`, incluido el stock de la tienda, el registro de correos y el HTML libre de las microwebs. Se puede promover a cualquier usuario desde *Usuarios*.
+
+En *Socios* hay una **campaña de renovación**: localiza a los socios de la temporada en curso que aún no han renovado para la siguiente y les envía un aviso por correo, con la opción de escribir solo a quien no haya recibido ninguno todavía. Cada envío queda registrado en la ficha del socio y en `/admin/correos`.
 
 ## Microweb de eventos
 
@@ -70,7 +93,9 @@ Cada evento se publica en `/nombre-evento` con pestañas propias. Desde `/admin/
 - **Inscripciones**: texto informativo; el panel de inscripción y pago se genera solo.
 - **Modalidades**: cada tipo de inscripción con su nombre, descripción, precio, precio de socio y plazas propias (por ejemplo *Marcha completa*, *Solo etapa 1*, *Acompañante*). Incluye el recuento de inscritos, las plazas ocupadas y lo recaudado por cada modalidad. Si no se crea ninguna, se usa el precio de la ficha del evento.
 - **Contacto**: persona, correo y teléfono de la organización.
-- **Inscritos**: listado con estado de pago y observaciones.
+- **Inscritos**: listado con estado de pago, datos del participante y observaciones, descargable en Excel.
+
+En la pestaña de **Inscripciones** se elige además qué datos pide la organización a cada participante: DNI, fecha de nacimiento, talla, club de procedencia, número de licencia federativa, contacto de emergencia y notas médicas. Se piden en el formulario, se guardan en la cuenta del participante para no volver a pedírselos, salen en el listado del panel y en el Excel.
 
 Las pestañas sin contenido no aparecen en la web pública. Los administradores globales pueden además añadir HTML libre al final de cada pestaña.
 
@@ -111,6 +136,10 @@ El logotipo completo no se lee a 16 píxeles, así que el favicon es una **adapt
 | `public/images/og.png` | 1200 × 630 px | Vista previa al compartir el enlace en redes y WhatsApp |
 
 Para que el favicon salga en Google hace falta, además de los archivos: que el dominio esté publicado y accesible, que la web esté indexada y que la etiqueta `<link rel="icon">` apunte a una URL estable. Todo eso ya está en `src/app/layout.tsx`, junto con los datos estructurados de `src/components/structured-data.tsx` (ficha `SportsOrganization` con el nombre legal, el CIF, la dirección y el logotipo). Google puede tardar entre unos días y varias semanas en actualizarlo tras la publicación.
+
+## Imágenes subidas desde el panel
+
+Los formularios de eventos, noticias y productos permiten arrastrar una imagen o elegirla del disco. Se recorta a 2000 píxeles como máximo, se convierte a WebP y se guarda en la carpeta `uploads/` (fuera de `public/`, para que sobreviva a los despliegues). Se sirven por la ruta `/media`. En producción conviene apuntar `UPLOADS_DIR` a un disco persistente, por ejemplo `/var/www/cdb/uploads`. En plataformas sin disco (Vercel y similares) hay que cambiar la escritura por un almacenamiento externo tipo S3 o R2: solo cambia el final de `src/app/api/uploads/route.ts`.
 
 ### Ilustraciones provisionales
 

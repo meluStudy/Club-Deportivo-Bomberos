@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, MessageSquare, Newspaper, Package, ShoppingBag, Users, UserCog, type LucideProps } from "lucide-react";
+import { BarChart3, CalendarDays, Mail, MessageSquare, Newspaper, Package, ShoppingBag, Users, UserCog, type LucideProps } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const icons: Record<string, React.ComponentType<LucideProps>> = { BarChart3, Users, ShoppingBag, Package, CalendarDays, Newspaper, MessageSquare, UserCog };
+const icons: Record<string, React.ComponentType<LucideProps>> = { BarChart3, Users, ShoppingBag, Package, CalendarDays, Newspaper, MessageSquare, Mail, UserCog };
 
 export function AdminNav({ links, subtitle }: { links: { href: string; label: string; icon: string }[]; subtitle?: string }) {
   const pathname = usePathname();

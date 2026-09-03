@@ -6,13 +6,13 @@ import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Iniciar sesión" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const { next } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; restablecida?: string }> }) {
+  const { next, restablecida } = await searchParams;
   const session = await getSession();
   if (session) redirect(next && next.startsWith("/") ? next : session.role === "ADMIN" ? "/admin" : "/cuenta");
   return (
     <AuthShell title="Bienvenido de nuevo" subtitle="Accede a tu cuenta de socio, participante o administrador.">
-      <LoginForm next={next} />
+      <LoginForm next={next} restablecida={Boolean(restablecida)} />
     </AuthShell>
   );
 }

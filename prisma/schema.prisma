@@ -27,6 +27,11 @@ model User {
   phone         String?
   dni           String?
   birthDate     DateTime?
+  shirtSize     String?   // talla de camiseta o maillot
+  clubName      String?   // club o parque de procedencia
+  licenseNumber String?   // número de licencia federativa
+  emergencyName  String?  // contacto en caso de emergencia
+  emergencyPhone String?
   isFirefighter Boolean  @default(false) // Bombero del Ayuntamiento de Madrid
   // Responsable de sección: puede gestionar noticias y eventos de esa sección desde el panel
   managedSectionId String?
@@ -39,6 +44,46 @@ model User {
   orders        Order[]
   payments      Payment[]
   posts         Post[]
+  resetTokens   PasswordResetToken[]
+}
+
+/// Enlace de un solo uso para restablecer la contraseña. Se guarda el hash,
+/// nunca el token en claro.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Registro de los correos enviados (o que se habrían enviado si no hay
+/// proveedor configurado). Sirve de acuse y de ayuda durante el desarrollo.
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  template  String
+  preview   String   // primeras líneas del contenido
+  status    String   // ENVIADO | REGISTRADO | ERROR
+  error     String?
+  meta      String?  // JSON con contexto (id de socio, evento…)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/// Contador de intentos para limitar accesos y envíos abusivos.
+model RateLimit {
+  key          String   @id
+  count        Int      @default(0)
+  firstAttempt DateTime @default(now())
+  blockedUntil DateTime?
+  updatedAt    DateTime @updatedAt
 }
 
 // ─────────────────────────── Socios ───────────────────────────
@@ -63,6 +108,7 @@ model Membership {
   paidAt       DateTime?
   startsAt     DateTime
   expiresAt    DateTime
+  renewalReminderAt DateTime?   // último aviso de renovación enviado
   createdAt    DateTime         @default(now())
 
   @@unique([userId, season])
@@ -155,6 +201,7 @@ model Event {
   contactPhone     String?
   contactInfo      String?  // Markdown adicional (Contacto)
   customHtml       String?  // JSON { pestaña: html } HTML libre por pestaña (solo administradores)
+  requiredFields   String?  // JSON con los datos que se piden al inscribirse (dni, talla, licencia…)
 
   registrations EventRegistration[]
   stages        EventStage[]
@@ -215,6 +262,15 @@ model EventRegistration {
   ticketId    String?
   ticket      EventTicket?       @relation(fields: [ticketId], references: [id], onDelete: SetNull)
   ticketName  String?            // nombre de la modalidad al inscribirse, por si luego cambia
+  // Datos del participante que pide la organización (según el evento)
+  dni            String?
+  birthDate      DateTime?
+  shirtSize      String?
+  clubName       String?
+  licenseNumber  String?
+  emergencyName  String?
+  emergencyPhone String?
+  medicalNotes   String?
   status      RegistrationStatus @default(PENDING)
   amountCents Int
   notes       String?

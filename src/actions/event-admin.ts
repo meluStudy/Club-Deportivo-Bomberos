@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { canManageSection, isAdmin, requireStaff } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { getTemplate, parseGpx, EVENT_TABS, type EventTabKey } from "@/lib/event-page";
+import { CAMPOS_PARTICIPANTE } from "@/lib/validators";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const num = (fd: FormData, k: string) => Number(String(fd.get(k) ?? "0").replace(",", "."));
@@ -53,6 +54,7 @@ export async function createEventAction(formData: FormData) {
       capacity: str(formData, "capacity") ? Math.floor(num(formData, "capacity")) : null,
       published: formData.get("published") === "on",
       ...(template?.fields ?? {}),
+      requiredFields: template?.requiredFields.length ? JSON.stringify(template.requiredFields) : null,
       stages: template
         ? { create: template.stages.map((s, i) => ({ order: i, name: s.name, startTime: s.startTime, startPlace: s.startPlace, endPlace: s.endPlace, distanceKm: s.distanceKm, elevationM: s.elevationM, description: s.description, schedule: s.schedule })) }
         : undefined,
@@ -118,9 +120,12 @@ export async function updateEventTabAction(formData: FormData) {
     case "programa":
       data.program = opt(formData, "program");
       break;
-    case "inscripciones":
+    case "inscripciones": {
       data.registrationInfo = opt(formData, "registrationInfo");
+      const campos = Object.keys(CAMPOS_PARTICIPANTE).filter((c) => formData.get(`campo_${c}`) !== null);
+      data.requiredFields = campos.length ? JSON.stringify(campos) : null;
       break;
+    }
     case "contacto":
       data.contactName = opt(formData, "contactName");
       data.contactEmail = opt(formData, "contactEmail");

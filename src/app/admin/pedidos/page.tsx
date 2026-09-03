@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Table, th, td, smallInput, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
+import { ExportButton } from "@/components/admin/export-button";
 import { formatDateTime, formatPrice } from "@/lib/utils";
 import { updateOrderStatusAction } from "@/actions/admin";
 
@@ -12,7 +13,7 @@ export default async function AdminOrders() {
   const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" }, include: { items: true }, take: 200 });
   return (
     <>
-      <AdminHeader title="Pedidos" description="Pedidos de la tienda oficial. Actualiza el estado a medida que preparas y entregas." />
+      <AdminHeader title="Pedidos" description="Pedidos de la tienda oficial. Actualiza el estado a medida que preparas y entregas." action={<ExportButton href="/api/export/pedidos">Descargar para Excel</ExportButton>} />
       <Table>
         <thead><tr><th className={th}>Ref.</th><th className={th}>Fecha</th><th className={th}>Cliente</th><th className={th}>Artículos</th><th className={th}>Entrega</th><th className={th}>Total</th><th className={th}>Estado</th></tr></thead>
         <tbody>

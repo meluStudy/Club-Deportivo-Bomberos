@@ -6,8 +6,11 @@ import { canManageSection, isAdmin, requireStaff } from "@/lib/auth";
 import { AdminHeader, Details, Table, th, td, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { Alert, Field, inputClass, textareaClass } from "@/components/ui/form";
-import { cn, formatPrice } from "@/lib/utils";
+import { ImageField } from "@/components/admin/image-field";
+import { ExportButton } from "@/components/admin/export-button";
+import { cn, formatDate, formatPrice, parseJson } from "@/lib/utils";
 import { EVENT_TABS, parseCustomHtml, parseGpxStats, type EventTabKey } from "@/lib/event-page";
+import { CAMPOS_PARTICIPANTE, type CampoParticipante } from "@/lib/validators";
 import { deleteEventAction, deleteStageAction, deleteTicketAction, removeStageGpxAction, updateEventBasicsAction, updateEventTabAction, upsertStageAction, upsertTicketAction } from "@/actions/event-admin";
 import { getTicketBreakdown } from "@/lib/tickets";
 import { Stat } from "@/components/admin/ui";
@@ -34,6 +37,7 @@ export default async function AdminEventEditor({ params, searchParams }: { param
   if (!canManageSection(staff, event.sectionId)) redirect("/admin/eventos?error=permiso");
   const sections = isAdmin(staff) ? await prisma.section.findMany({ orderBy: { order: "asc" } }) : [];
   const breakdown = await getTicketBreakdown(event.id);
+  const campos = parseJson<CampoParticipante[]>(event.requiredFields, []);
   const tab = ADMIN_TABS.some((t) => t.key === sp.tab) ? sp.tab! : "ficha";
   const html = parseCustomHtml(event.customHtml);
   const admin = isAdmin(staff);
@@ -99,8 +103,8 @@ export default async function AdminEventEditor({ params, searchParams }: { param
             <Field label="Precio general (€)" name="price"><input id="price" name="price" type="number" step="0.01" min={0} defaultValue={event.priceCents / 100} className={inputClass} /></Field>
             <Field label="Precio socios (€, opcional)" name="memberPrice"><input id="memberPrice" name="memberPrice" type="number" step="0.01" min={0} defaultValue={event.memberPriceCents != null ? event.memberPriceCents / 100 : ""} className={inputClass} /></Field>
             <Field label="Plazas (vacío = ilimitadas)" name="capacity"><input id="capacity" name="capacity" type="number" min={1} defaultValue={event.capacity ?? ""} className={inputClass} /></Field>
-            <Field label="Imagen de tarjeta (ruta o URL)" name="image"><input id="image" name="image" defaultValue={event.coverImage ?? ""} className={inputClass} /></Field>
-            <Field label="Imagen de cabecera de la microweb" name="heroImage"><input id="heroImage" name="heroImage" defaultValue={event.heroImage ?? ""} className={inputClass} placeholder="Si se deja vacío se usa la de tarjeta" /></Field>
+            <ImageField name="image" label="Imagen de tarjeta" defaultValue={event.coverImage} hint="Se ve en los listados y en la portada." />
+            <ImageField name="heroImage" label="Imagen de cabecera de la microweb" defaultValue={event.heroImage} hint="Si se deja vacía se usa la de tarjeta." />
             <Field label="Descripción corta (tarjetas y listados)" name="description" className="sm:col-span-2"><textarea id="description" name="description" defaultValue={event.description} className={textareaClass} /></Field>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" defaultChecked={event.published} className="size-4 accent-brand-600" /> Publicado (visible para todo el mundo)</label>
             <div className="sm:col-span-2"><button className={smallBtn}>Guardar ficha</button></div>
@@ -149,7 +153,23 @@ export default async function AdminEventEditor({ params, searchParams }: { param
         )}
 
         {tab === "inscripciones" && tabForm("inscripciones", (
-          <Field label="Información de inscripción (markdown)" name="registrationInfo"><textarea id="registrationInfo" name="registrationInfo" defaultValue={event.registrationInfo ?? ""} className={`${textareaClass} min-h-64`} /></Field>
+          <>
+            <Field label="Información de inscripción (markdown)" name="registrationInfo"><textarea id="registrationInfo" name="registrationInfo" defaultValue={event.registrationInfo ?? ""} className={`${textareaClass} min-h-56`} /></Field>
+            <fieldset className="rounded-xl border border-ink-200 p-4">
+              <legend className="px-1 text-sm font-semibold text-ink-800">Datos que se piden al inscribirse</legend>
+              <p className="mb-3 text-sm text-ink-600">
+                Marca lo que necesite la organización (seguro, licencias, tallas). Se piden en el formulario y salen en el listado y en el Excel de inscritos.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {Object.entries(CAMPOS_PARTICIPANTE).map(([clave, cfg]) => (
+                  <label key={clave} className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name={`campo_${clave}`} defaultChecked={parseJson<string[]>(event.requiredFields, []).includes(clave)} className="size-4 accent-brand-600" />
+                    {cfg.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </>
         ), `El panel de inscripción y pago se genera automáticamente con los precios de la ficha (${formatPrice(event.priceCents)}${event.memberPriceCents != null ? ` / socios ${formatPrice(event.memberPriceCents)}` : ""}).`)}
 
         {tab === "contacto" && tabForm("contacto", (
@@ -243,21 +263,35 @@ export default async function AdminEventEditor({ params, searchParams }: { param
 
         {tab === "inscritos" && (
           <>
-            <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold uppercase"><Users className="size-5 text-brand-600" /> Inscritos ({event.registrations.filter((r) => r.status === "CONFIRMED").length} confirmados)</h2>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-2xl font-bold uppercase"><Users className="size-5 text-brand-600" /> Inscritos ({event.registrations.filter((r) => r.status === "CONFIRMED").length} confirmados)</h2>
+              <ExportButton href={`/api/export/inscritos?evento=${event.id}`}>Descargar para Excel</ExportButton>
+            </div>
             <Table>
-              <thead><tr><th className={th}>Nombre</th><th className={th}>Contacto</th><th className={th}>Modalidad</th><th className={th}>Importe</th><th className={th}>Estado</th><th className={th}>Observaciones</th></tr></thead>
+              <thead><tr><th className={th}>Nombre</th><th className={th}>Contacto</th><th className={th}>Modalidad</th><th className={th}>Datos</th><th className={th}>Importe</th><th className={th}>Estado</th><th className={th}>Observaciones</th></tr></thead>
               <tbody>
                 {event.registrations.map((r) => (
                   <tr key={r.id}>
                     <td className={td}>{r.user.name}</td>
                     <td className={td}>{r.user.email}<br /><span className="text-ink-500">{r.user.phone ?? ""}</span></td>
                     <td className={td}>{r.ticketName ?? "—"}</td>
+                    <td className={td}>
+                      {campos.length === 0 ? "—" : (
+                        <ul className="space-y-0.5 text-xs text-ink-600">
+                          {campos.map((c) => {
+                            const v = r[c as keyof typeof r];
+                            const texto = c === "birthDate" ? (v ? formatDate(v as Date) : "") : ((v as string) ?? "");
+                            return texto ? <li key={c}><span className="text-ink-400">{CAMPOS_PARTICIPANTE[c].label}:</span> {texto}</li> : null;
+                          })}
+                        </ul>
+                      )}
+                    </td>
                     <td className={td}>{formatPrice(r.amountCents)}</td>
                     <td className={td}><Badge tone={r.status === "CONFIRMED" ? "success" : r.status === "PENDING" ? "warning" : "neutral"}>{r.status === "CONFIRMED" ? "Confirmada" : r.status === "PENDING" ? "Pendiente" : "Cancelada"}</Badge></td>
                     <td className={td}>{r.notes ?? "—"}</td>
                   </tr>
                 ))}
-                {event.registrations.length === 0 && <tr><td className={td} colSpan={6}><span className="text-ink-500">Sin inscripciones todavía.</span></td></tr>}
+                {event.registrations.length === 0 && <tr><td className={td} colSpan={7}><span className="text-ink-500">Sin inscripciones todavía.</span></td></tr>}
               </tbody>
             </Table>
           </>

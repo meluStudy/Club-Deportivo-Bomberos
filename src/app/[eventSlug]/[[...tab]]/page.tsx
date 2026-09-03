@@ -17,6 +17,8 @@ import { getEventTickets } from "@/lib/tickets";
 import { site } from "@/lib/site";
 import { formatDate, formatPrice } from "@/lib/utils";
 import { EVENT_TABS, parseAccommodations, parseCustomHtml, parsePairs, parseProgram, visibleTabs, type EventTabKey } from "@/lib/event-page";
+import { parseJson } from "@/lib/utils";
+import type { CampoParticipante } from "@/lib/validators";
 
 type Props = { params: Promise<{ eventSlug: string; tab?: string[] }>; searchParams: Promise<Record<string, string | undefined>> };
 export const dynamic = "force-dynamic";
@@ -60,6 +62,18 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
     getEventTickets(event.id),
   ]);
   const isMember = Boolean(membership);
+  const campos = parseJson<CampoParticipante[]>(event.requiredFields, []);
+  const perfil: Partial<Record<CampoParticipante, string>> = user
+    ? {
+        dni: user.dni ?? undefined,
+        birthDate: user.birthDate ? new Date(user.birthDate).toISOString().slice(0, 10) : undefined,
+        shirtSize: user.shirtSize ?? undefined,
+        clubName: user.clubName ?? undefined,
+        licenseNumber: user.licenseNumber ?? undefined,
+        emergencyName: user.emergencyName ?? undefined,
+        emergencyPhone: user.emergencyPhone ?? undefined,
+      }
+    : {};
   const highlights = parsePairs(event.highlights);
   const stagesKm = event.stages.reduce((n, s) => n + (s.distanceKm ?? 0), 0);
   const totalEle = event.stages.reduce((n, s) => n + (s.elevationM ?? 0), 0);
@@ -96,7 +110,7 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
       <Container className="py-12 sm:py-16">
         {key === "inicio" && (
           <div className="grid gap-12 lg:grid-cols-12">
-            <div className="space-y-12 lg:col-span-8">
+            <div className="min-w-0 space-y-12 lg:col-span-8">
               {highlights.length > 0 && (
                 <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {highlights.map((h) => (
@@ -126,9 +140,9 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
               )}
               {html.inicio && <Reveal><div className="prose-club" dangerouslySetInnerHTML={{ __html: html.inicio }} /></Reveal>}
             </div>
-            <aside className="lg:col-span-4">
+            <aside className="min-w-0 lg:col-span-4">
               <div className="sticky top-36 space-y-4">
-                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} messages={sp} returnTo={base} />
+                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} campos={campos} perfil={perfil} messages={sp} returnTo={base} />
                 <div className="rounded-2xl bg-ink-950 p-5 text-sm text-ink-200">
                   <p className="flex items-center gap-2"><MapPin className="size-4 text-brand-500" /> {event.location}</p>
                   <p className="mt-2 flex items-center gap-2"><Users className="size-4 text-brand-500" /> {event._count.registrations} inscritos{event.capacity ? ` · ${event.capacity} plazas` : ""}</p>
@@ -206,12 +220,12 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
 
         {key === "inscripciones" && (
           <div className="grid gap-12 lg:grid-cols-12">
-            <Reveal className="lg:col-span-7">
+            <Reveal className="min-w-0 lg:col-span-7">
               {event.registrationInfo ? <Markdown content={event.registrationInfo} className="text-lg" /> : <p className="text-ink-600">Completa la inscripción desde el panel de la derecha.</p>}
               {tickets.length > 0 ? (
                 <div className="mt-8">
                   <h2 className="mb-4 text-2xl font-bold uppercase">Modalidades</h2>
-                  <div className="overflow-x-auto rounded-2xl border border-ink-100">
+                  <div className="-mx-1 overflow-x-auto rounded-2xl border border-ink-100">
                     <table className="w-full min-w-[420px] text-sm">
                       <thead>
                         <tr className="border-b border-ink-100 bg-ink-50 text-left">
@@ -246,9 +260,9 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
               )}
               {html.inscripciones && <div className="prose-club mt-8" dangerouslySetInnerHTML={{ __html: html.inscripciones }} />}
             </Reveal>
-            <aside className="lg:col-span-5">
+            <aside className="min-w-0 lg:col-span-5">
               <div className="sticky top-36">
-                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} messages={sp} returnTo={`${base}/inscripciones`} />
+                <RegistrationPanel event={event} tickets={tickets} user={user} isMember={isMember} alreadyIn={registration?.status === "CONFIRMED"} currentTicketName={registration?.ticketName} campos={campos} perfil={perfil} messages={sp} returnTo={`${base}/inscripciones`} />
               </div>
             </aside>
           </div>

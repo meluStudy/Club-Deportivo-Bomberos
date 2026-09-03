@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AdminHeader, Table, th, td, smallInput, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
+import { ExportButton } from "@/components/admin/export-button";
 import { formatDate } from "@/lib/utils";
 import { setUserRoleAction } from "@/actions/admin";
 import { requireAdmin } from "@/lib/auth";
@@ -13,7 +14,7 @@ export default async function AdminUsers() {
   ]);
   return (
     <>
-      <AdminHeader title="Usuarios" description="Cuentas registradas, roles y responsables de sección. Un responsable de sección gestiona las noticias y los eventos (con su microweb) de su sección." />
+      <AdminHeader title="Usuarios" description="Cuentas registradas, roles y responsables de sección. Un responsable de sección gestiona las noticias y los eventos (con su microweb) de su sección." action={<ExportButton href="/api/export/usuarios">Descargar para Excel</ExportButton>} />
       <Table>
         <thead><tr><th className={th}>Nombre</th><th className={th}>Correo</th><th className={th}>Alta</th><th className={th}>Actividad</th><th className={th}>Rol y sección que gestiona</th></tr></thead>
         <tbody>

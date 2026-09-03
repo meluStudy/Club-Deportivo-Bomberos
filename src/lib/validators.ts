@@ -46,3 +46,30 @@ export type FormState = {
   message?: string;
   errors?: Record<string, string[]>;
 };
+
+export const solicitarResetSchema = z.object({
+  email: z.string().trim().email("Correo electrónico no válido").toLowerCase(),
+});
+
+export const resetSchema = z
+  .object({
+    token: z.string().min(10),
+    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").max(100),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, { message: "Las contraseñas no coinciden", path: ["confirmPassword"] });
+
+/** Datos del participante que puede pedir la organización de un evento. */
+export const CAMPOS_PARTICIPANTE = {
+  dni: { label: "DNI o NIE", tipo: "texto" },
+  birthDate: { label: "Fecha de nacimiento", tipo: "fecha" },
+  shirtSize: { label: "Talla de camiseta o maillot", tipo: "talla" },
+  clubName: { label: "Club o parque de procedencia", tipo: "texto" },
+  licenseNumber: { label: "Número de licencia federativa", tipo: "texto" },
+  emergencyName: { label: "Contacto de emergencia (nombre)", tipo: "texto" },
+  emergencyPhone: { label: "Contacto de emergencia (teléfono)", tipo: "telefono" },
+  medicalNotes: { label: "Alergias o condiciones médicas", tipo: "texto-largo" },
+} as const;
+
+export type CampoParticipante = keyof typeof CAMPOS_PARTICIPANTE;
+export const TALLAS = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];

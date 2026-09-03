@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/eventos", label: "Eventos", icon: "CalendarDays", show: true },
     { href: "/admin/noticias", label: "Noticias", icon: "Newspaper", show: true },
     { href: "/admin/mensajes", label: "Mensajes", icon: "MessageSquare", show: admin },
+    { href: "/admin/correos", label: "Correos", icon: "Mail", show: admin },
     { href: "/admin/usuarios", label: "Usuarios", icon: "UserCog", show: admin },
   ].filter((l) => l.show);
   return (

@@ -246,6 +246,8 @@ export type EventTemplate = {
   stages: { name: string; startTime: string; startPlace: string; endPlace: string; distanceKm: number; elevationM: number; description: string; schedule: string }[];
   /** Modalidades de inscripción que se crean con el evento. */
   tickets: { name: string; description: string; priceCents: number; memberPriceCents: number | null; capacity: number | null }[];
+  /** Datos del participante que pide la organización. */
+  requiredFields: string[];
 };
 
 export const EVENT_TEMPLATES: EventTemplate[] = [
@@ -274,6 +276,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
       { name: "Solo etapa 2 · Cercedilla – Madrid", description: "Domingo. Incluye maillot, avituallamientos y comida de clausura.", priceCents: 3500, memberPriceCents: 2500, capacity: 40 },
       { name: "Acompañante", description: "Para quien no pedalea: cena del sábado, comida de clausura y transporte entre etapas.", priceCents: 3000, memberPriceCents: 2000, capacity: 50 },
     ],
+    requiredFields: ["dni", "birthDate", "shirtSize", "clubName", "emergencyName", "emergencyPhone", "medicalNotes"],
   },
   {
     key: "carrera",
@@ -294,6 +297,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
     tickets: [
       { name: "Inscripción general", description: "Dorsal con chip, camiseta técnica, avituallamiento y seguro.", priceCents: 1200, memberPriceCents: 800, capacity: null },
     ],
+    requiredFields: ["dni", "birthDate", "shirtSize", "emergencyPhone"],
   },
   {
     key: "en-blanco",
@@ -302,6 +306,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
     fields: { subtitle: "", highlights: "", intro: "", presentation: "", accommodation: "", accommodations: "", program: "", registrationInfo: "", contactInfo: "" },
     stages: [],
     tickets: [],
+    requiredFields: [],
   },
 ];
 

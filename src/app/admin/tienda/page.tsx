@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { AdminHeader, Details, Table, th, td, smallInput, smallBtn } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
+import { ExportButton } from "@/components/admin/export-button";
 import { formatPrice, parseJson, sortVariants } from "@/lib/utils";
 import { toggleProductAction, updateStockAction, upsertProductAction } from "@/actions/admin";
 import { inputClass, textareaClass, Field } from "@/components/ui/form";
+import { ImageField } from "@/components/admin/image-field";
 
 export default async function AdminShop() {
   await requireAdmin();
@@ -12,7 +14,7 @@ export default async function AdminShop() {
 
   return (
     <>
-      <AdminHeader title="Tienda y stock" description="Inventario por talla y color. Los cambios se reflejan al instante en la tienda." />
+      <AdminHeader title="Tienda y stock" description="Inventario por talla y color. Los cambios se reflejan al instante en la tienda." action={<ExportButton href="/api/export/pedidos">Descargar pedidos</ExportButton>} />
 
       <Details summary="➕ Añadir producto nuevo">
         <ProductForm />
@@ -74,7 +76,7 @@ function ProductForm({ product }: { product?: { id: string; name: string; slug: 
       <Field label="Nombre" name="name"><input id="name" name="name" defaultValue={product?.name} required className={inputClass} /></Field>
       <Field label="Slug (URL)" name="slug" hint="Se genera automáticamente si se deja vacío"><input id="slug" name="slug" defaultValue={product?.slug} className={inputClass} /></Field>
       <Field label="Categoría" name="category"><input id="category" name="category" defaultValue={product?.category ?? "Equipación"} className={inputClass} /></Field>
-      <Field label="Imagen (ruta o URL)" name="image"><input id="image" name="image" defaultValue={parseJson<string[]>(product?.images ?? "[]", [])[0]} className={inputClass} placeholder="/images/products/mi-producto.jpg" /></Field>
+      <ImageField name="image" label="Imagen del producto" defaultValue={parseJson<string[]>(product?.images ?? "[]", [])[0]} aspect="aspect-square" />
       <Field label="Precio (€)" name="price"><input id="price" name="price" type="number" step="0.01" min={0} defaultValue={product ? product.priceCents / 100 : ""} required className={inputClass} /></Field>
       <Field label="Precio socios (€, opcional)" name="memberPrice"><input id="memberPrice" name="memberPrice" type="number" step="0.01" min={0} defaultValue={product?.memberPriceCents != null ? product.memberPriceCents / 100 : ""} className={inputClass} /></Field>
       <Field label="Descripción" name="description" className="sm:col-span-2"><textarea id="description" name="description" defaultValue={product?.description} className={textareaClass} /></Field>

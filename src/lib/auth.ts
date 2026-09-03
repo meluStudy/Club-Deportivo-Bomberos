@@ -79,7 +79,10 @@ export async function getCurrentUser() {
   if (!session) return null;
   const user = await prisma.user.findUnique({
     where: { id: session.id },
-    select: { id: true, name: true, email: true, role: true, phone: true, isFirefighter: true, createdAt: true },
+    select: {
+      id: true, name: true, email: true, role: true, phone: true, isFirefighter: true, createdAt: true,
+      dni: true, birthDate: true, shirtSize: true, clubName: true, licenseNumber: true, emergencyName: true, emergencyPhone: true,
+    },
   });
   return user;
 }

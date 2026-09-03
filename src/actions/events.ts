@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { getActiveMembership } from "@/lib/data";
 import { getEventTickets, ticketPrice } from "@/lib/tickets";
+import { CAMPOS_PARTICIPANTE, type CampoParticipante } from "@/lib/validators";
+import { parseJson } from "@/lib/utils";
 import { startCheckout } from "@/lib/payments";
 
 export async function registerForEventAction(formData: FormData) {
@@ -41,9 +43,33 @@ export async function registerForEventAction(formData: FormData) {
   const amountCents = ticket ? ticketPrice(ticket, isMember) : isMember && event.memberPriceCents != null ? event.memberPriceCents : event.priceCents;
   const ticketData = { ticketId: ticket?.id ?? null, ticketName: ticket?.name ?? null };
 
+  // Datos del participante que pide este evento
+  const pedidos = parseJson<CampoParticipante[]>(event.requiredFields, []);
+  const datos: Record<string, string | Date | null> = {};
+  const faltan: string[] = [];
+  for (const campo of pedidos) {
+    if (!(campo in CAMPOS_PARTICIPANTE)) continue;
+    const valor = String(formData.get(campo) ?? "").trim().slice(0, 300);
+    if (!valor) {
+      // Las notas médicas son opcionales aunque se pidan
+      if (campo !== "medicalNotes") faltan.push(campo);
+      datos[campo] = null;
+      continue;
+    }
+    datos[campo] = campo === "birthDate" ? new Date(valor) : valor;
+  }
+  if (faltan.length) redirect(`${back}?error=datos&campos=${faltan.join(",")}`);
+
+  // Se guardan también en el perfil, para no volver a pedirlos la próxima vez
+  const perfil: Record<string, string | Date | null> = {};
+  for (const k of ["dni", "birthDate", "shirtSize", "clubName", "licenseNumber", "emergencyName", "emergencyPhone"] as const) {
+    if (datos[k]) perfil[k] = datos[k];
+  }
+  if (Object.keys(perfil).length) await prisma.user.update({ where: { id: user.id }, data: perfil });
+
   const registration = existing
-    ? await prisma.eventRegistration.update({ where: { id: existing.id }, data: { status: "PENDING", amountCents, notes, ...ticketData } })
-    : await prisma.eventRegistration.create({ data: { eventId: event.id, userId: user.id, amountCents, notes, ...ticketData } });
+    ? await prisma.eventRegistration.update({ where: { id: existing.id }, data: { status: "PENDING", amountCents, notes, ...ticketData, ...datos } })
+    : await prisma.eventRegistration.create({ data: { eventId: event.id, userId: user.id, amountCents, notes, ...ticketData, ...datos } });
 
   const url = await startCheckout({
     type: "EVENT",

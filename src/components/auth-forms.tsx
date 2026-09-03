@@ -6,17 +6,23 @@ import { loginAction, registerAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Alert, Field, inputClass } from "@/components/ui/form";
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({ next, restablecida }: { next?: string; restablecida?: boolean }) {
   const [state, action, pending] = useActionState(loginAction, {});
   return (
     <form action={action} className="space-y-5">
       {next && <input type="hidden" name="next" value={next} />}
+      {restablecida && <Alert tone="success">Contraseña actualizada. Ya puedes entrar con la nueva.</Alert>}
       <Field label="Correo electrónico" name="email" error={state.errors?.email}>
         <input id="email" name="email" type="email" autoComplete="email" required className={inputClass} />
       </Field>
       <Field label="Contraseña" name="password" error={state.errors?.password}>
         <input id="password" name="password" type="password" autoComplete="current-password" required className={inputClass} />
       </Field>
+      <p className="-mt-2 text-right">
+        <Link href="/recuperar-contrasena" className="text-sm text-ink-600 underline hover:text-brand-600">
+          He olvidado mi contraseña
+        </Link>
+      </p>
       {state.message && <Alert tone="error">{state.message}</Alert>}
       <Button type="submit" loading={pending} className="w-full" size="lg">Entrar</Button>
       <p className="text-center text-sm text-ink-600">

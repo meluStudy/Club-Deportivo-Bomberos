@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { deletePostAction, upsertPostAction } from "@/actions/admin";
 import { Field, inputClass, textareaClass } from "@/components/ui/form";
+import { ImageField } from "@/components/admin/image-field";
 
 export default async function AdminPosts() {
   const staff = await requireStaff();
@@ -47,7 +48,7 @@ function PostForm({ sections, post, admin }: { sections: { id: string; name: str
           {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
       </Field>
-      <Field label="Imagen de portada (ruta o URL)" name="image"><input id="image" name="image" defaultValue={post?.coverImage ?? ""} className={inputClass} /></Field>
+      <ImageField name="image" label="Imagen de portada" defaultValue={post?.coverImage} />
       <Field label="Entradilla" name="excerpt" className="sm:col-span-2"><input id="excerpt" name="excerpt" defaultValue={post?.excerpt} required className={inputClass} /></Field>
       <Field label="Contenido (markdown sencillo: ## títulos, **negrita**, listas con -)" name="content" className="sm:col-span-2"><textarea id="content" name="content" defaultValue={post?.content} required className={`${textareaClass} min-h-64`} /></Field>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={post?.featured} className="size-4 accent-brand-600" /> Destacar en portada</label>

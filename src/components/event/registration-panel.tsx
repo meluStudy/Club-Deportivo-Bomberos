@@ -8,6 +8,8 @@ import { Alert, Field, textareaClass } from "@/components/ui/form";
 import { registerForEventAction } from "@/actions/events";
 import { cn, formatPrice } from "@/lib/utils";
 import type { TicketOption } from "@/lib/tickets";
+import { ParticipantFields } from "./participant-fields";
+import type { CampoParticipante } from "@/lib/validators";
 
 type Props = {
   event: { slug: string; priceCents: number; memberPriceCents: number | null; capacity: number | null; registrationDeadline: Date | null; startsAt: Date; _count: { registrations: number } };
@@ -16,6 +18,8 @@ type Props = {
   isMember: boolean;
   alreadyIn: boolean;
   currentTicketName?: string | null;
+  campos: CampoParticipante[];
+  perfil: Partial<Record<CampoParticipante, string>>;
   messages: Record<string, string | undefined>;
   returnTo: string;
 };
@@ -23,7 +27,7 @@ type Props = {
 const priceOf = (t: TicketOption, isMember: boolean) => (isMember && t.memberPriceCents != null ? t.memberPriceCents : t.priceCents);
 const label = (cents: number) => (cents === 0 ? "Gratis" : formatPrice(cents));
 
-export function RegistrationPanel({ event, tickets, user, isMember, alreadyIn, currentTicketName, messages: sp, returnTo }: Props) {
+export function RegistrationPanel({ event, tickets, user, isMember, alreadyIn, currentTicketName, campos, perfil, messages: sp, returnTo }: Props) {
   const available = tickets.filter((t) => !t.soldOut);
   const [ticketId, setTicketId] = useState<string>(available[0]?.id ?? "");
 
@@ -76,6 +80,7 @@ export function RegistrationPanel({ event, tickets, user, isMember, alreadyIn, c
         {sp.error === "cerrado" && <Alert tone="error">El plazo de inscripción ha finalizado.</Alert>}
         {sp.error === "modalidad" && <Alert tone="error">Elige una modalidad para continuar.</Alert>}
         {sp.error === "modalidad-completa" && <Alert tone="error">Esa modalidad se ha completado. Elige otra.</Alert>}
+        {sp.error === "datos" && <Alert tone="error">Faltan datos obligatorios del participante.</Alert>}
 
         {alreadyIn ? (
           <Alert tone="success">
@@ -144,7 +149,9 @@ export function RegistrationPanel({ event, tickets, user, isMember, alreadyIn, c
               </fieldset>
             )}
 
-            <Field label="Observaciones (talla de maillot, alergias, club…)" name="notes">
+            <ParticipantFields campos={campos} perfil={perfil} faltan={(sp.campos ?? "").split(",").filter(Boolean)} />
+
+            <Field label="Observaciones para la organización (opcional)" name="notes">
               <textarea id="notes" name="notes" className={textareaClass} maxLength={500} />
             </Field>
             <Button type="submit" className="w-full" disabled={tickets.length > 0 && !ticketId}>

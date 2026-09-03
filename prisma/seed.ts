@@ -126,6 +126,7 @@ async function main() {
     contactName: "Sección de ciclismo · Pablo Iglesias",
     contactEmail: "ciclismo@clubdeportivobomberos.es",
     contactPhone: "+34 600 000 000",
+    requiredFields: JSON.stringify(tpl.requiredFields),
     ...tpl.fields,
   };
   const marcha = await prisma.event.upsert({ where: { slug: "marcha-ciclista-bomberos" }, update: marchaData, create: { slug: "marcha-ciclista-bomberos", ...marchaData } });
