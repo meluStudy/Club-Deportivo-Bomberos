@@ -1,7 +1,8 @@
 # Despliegue: entorno de pruebas y producción
 
-Guía para poner la web en marcha con dos entornos: uno de **pruebas** donde se
-valida cada cambio y otro de **producción** que ve el público.
+Guía para poner la web en marcha en un **VPS de Hostinger (plan KVM 2)** con
+**Coolify**, en dos entornos: uno de pruebas donde se valida cada cambio y otro
+de producción que ve el público.
 
 ---
 
@@ -15,72 +16,81 @@ valida cada cambio y otro de **producción** que ve el público.
 | Dominio con HTTPS | Obligatorio: las sesiones usan cookies seguras y Stripe exige HTTPS |
 | Correo saliente | Resend o el SMTP del dominio, para recuperar contraseña y avisos |
 
-Esto descarta el alojamiento compartido clásico (el de PHP y cPanel): la web
-necesita un proceso Node ejecutándose de forma permanente.
+La compilación **no necesita la base de datos**: se puede construir la web
+aunque PostgreSQL esté apagado. Esto está comprobado y evita que un despliegue
+falle por un problema de conexión.
 
 ---
 
-## 2. Dónde alojarla
+## 2. Contratar y preparar el VPS
 
-### Opción recomendada: un VPS con Coolify
+### 2.1. El plan
 
-Un único servidor virtual alberga los dos entornos y las dos bases de datos.
-**Coolify** es un panel de control que se instala en el servidor y se encarga de
-desplegar desde GitHub, renovar los certificados HTTPS, gestionar las variables
-de entorno y hacer copias de seguridad. Se maneja desde el navegador.
+En Hostinger, **VPS KVM 2** (2 vCPU y 8 GB de RAM en el catálogo actual;
+comprueba las características al contratar). Con 8 GB va sobrado para los dos
+entornos y las dos bases de datos. Elige el centro de datos más cercano a
+España.
 
-- **Servidor**: Hostinger VPS KVM 2 o Hetzner CX22. Mínimo 2 vCPU y 4 GB de RAM
-  (con 2 GB va justo al compilar). Precio orientativo: entre 5 y 12 € al mes.
-- **Sistema**: Ubuntu 24.04.
-- **Coste total** aproximado: el VPS más el dominio. Sin más cuotas.
+Al crearlo, Hostinger pregunta por el sistema operativo. Dos caminos:
 
-Ventajas: las imágenes subidas se guardan en el disco del servidor sin
-configurar nada más, la base de datos está al lado de la web (rápida y sin
-coste aparte) y los dos entornos caben en la misma máquina.
+- **Camino corto**: en la lista de plantillas de aplicaciones, si aparece
+  **Coolify**, elígela. Hostinger instala Ubuntu y Coolify de una vez y te da
+  la dirección del panel al terminar. Puedes saltar al punto 2.3.
+- **Camino manual**: elige **Ubuntu 24.04** limpio y sigue el punto 2.2.
 
-Inconveniente: el servidor es tuyo, así que las actualizaciones del sistema y
-las copias de seguridad son responsabilidad del club. Coolify automatiza casi
-todo, pero conviene revisarlo de vez en cuando.
+Durante la creación, Hostinger pide una contraseña de root y permite añadir una
+clave SSH. Añade tu clave pública: es más cómodo y más seguro que la contraseña.
 
-### Alternativa sin servidor propio: Vercel más Neon
+### 2.2. Instalar Coolify a mano
 
-- **Vercel** aloja la web: cada rama genera su propia dirección de pruebas y
-  `main` va a producción, sin configurar nada.
-- **Neon** o **Supabase** para PostgreSQL, con una base de datos por entorno.
-- **Cloudflare R2** o **Vercel Blob** para las imágenes subidas: Vercel no tiene
-  disco persistente, así que hay que cambiar el final de
-  `src/app/api/uploads/route.ts` para que escriba en el almacenamiento externo.
-- Coste orientativo: el plan Pro de Vercel ronda los 20 $ al mes (el gratuito no
-  cubre usos comerciales, y la tienda lo es), más lo que consuma la base de datos.
-
-Ventaja: cero mantenimiento de servidor y vuelta atrás inmediata. Inconveniente:
-más caro y hay que tocar el código de las subidas.
-
-### Lo que no recomiendo
-
-- **Alojamiento compartido de Hostinger** (el de webs PHP): no puede ejecutar
-  Next.js.
-- **Node.js hosting de Hostinger**: limitado en memoria y sin buen control del
-  proceso; la compilación de Next.js se queda corta.
-
----
-
-## 3. Montaje paso a paso en un VPS con Coolify
-
-### 3.1. Preparar el servidor
+Desde tu ordenador:
 
 ```bash
-ssh root@IP-DEL-SERVIDOR
+ssh root@IP-DE-TU-VPS
+
+# Actualizar el sistema
 apt update && apt upgrade -y
+
+# Instalar Coolify (instala Docker y todo lo necesario)
 curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
 ```
 
-Al terminar, Coolify indica la dirección del panel. Entra, crea la cuenta de
-administrador y conecta la cuenta de GitHub para que pueda leer el repositorio.
+Tarda unos minutos. Al acabar muestra la dirección del panel, que será
+`http://IP-DE-TU-VPS:8000`. Ábrela en el navegador y **crea la cuenta de
+administrador en ese mismo momento**: el primero que entre se queda con el
+panel.
 
-### 3.2. DNS del dominio
+### 2.3. Cortafuegos
 
-En el panel del dominio, dos registros apuntando a la IP del servidor:
+En el panel de Hostinger (hPanel), sección de cortafuegos del VPS, deja
+abiertos solo estos puertos de entrada:
+
+| Puerto | Para qué |
+| --- | --- |
+| 22 | SSH |
+| 80 | HTTP (necesario para emitir los certificados) |
+| 443 | HTTPS |
+| 8000 | Panel de Coolify |
+
+Una vez que asignes un dominio propio al panel de Coolify (por ejemplo
+`panel.clubdeportivobomberos.es`), puedes cerrar el 8000.
+
+### 2.4. Un par de ajustes recomendados
+
+```bash
+# Zona horaria de Madrid, para que las horas de los registros cuadren
+timedatectl set-timezone Europe/Madrid
+
+# Actualizaciones de seguridad automáticas
+apt install -y unattended-upgrades
+dpkg-reconfigure --priority=low unattended-upgrades
+```
+
+---
+
+## 3. DNS del dominio
+
+En el panel donde tengas el dominio, tres registros apuntando a la IP del VPS:
 
 | Tipo | Nombre | Valor |
 | --- | --- | --- |
@@ -89,23 +99,33 @@ En el panel del dominio, dos registros apuntando a la IP del servidor:
 | A | `test` | IP del servidor |
 
 Resultado: `clubdeportivobomberos.es` (producción) y
-`test.clubdeportivobomberos.es` (pruebas).
+`test.clubdeportivobomberos.es` (pruebas). Los cambios de DNS pueden tardar un
+rato en propagarse; espera a que respondan antes de emitir los certificados.
 
-### 3.3. Las dos bases de datos
+---
 
-En Coolify, **New Resource → PostgreSQL**, dos veces:
+## 4. Montar los dos entornos en Coolify
+
+### 4.1. Conectar GitHub
+
+En Coolify, **Sources → GitHub → Add**. Autoriza el acceso al repositorio del
+club. Así Coolify podrá desplegar solo cada vez que se actualice una rama.
+
+### 4.2. Las dos bases de datos
+
+**New Resource → Database → PostgreSQL**, dos veces:
 
 - `cdb-produccion`
 - `cdb-test`
 
-Coolify genera la contraseña y la cadena de conexión de cada una. Activa las
-copias de seguridad automáticas de la de producción (diarias, con destino en un
-almacenamiento externo tipo S3 o Backblaze).
+Coolify genera la contraseña y la cadena de conexión de cada una. Guárdalas.
+En la de producción, activa las copias de seguridad automáticas (diarias) con
+destino en un almacenamiento externo tipo S3 o Backblaze.
 
-### 3.4. Las dos aplicaciones
+### 4.3. Las dos aplicaciones
 
-**New Resource → Application → GitHub**, apuntando a este repositorio. Se crean
-dos aplicaciones con la misma configuración salvo la rama y las variables:
+**New Resource → Application → GitHub → este repositorio**. Se crean dos
+aplicaciones idénticas salvo la rama, el dominio y las variables:
 
 | | Producción | Pruebas |
 | --- | --- | --- |
@@ -114,20 +134,23 @@ dos aplicaciones con la misma configuración salvo la rama y las variables:
 | Base de datos | `cdb-produccion` | `cdb-test` |
 | Stripe | Claves reales | Claves de prueba |
 
-En ambas:
+Configuración en las dos:
 
+- **Build pack**: Nixpacks (Coolify detecta Next.js automáticamente).
 - **Build command**: `npm ci && npm run build`
 - **Start command**: `npm run db:deploy && npm start`
 - **Port**: `3000`
-- **Volumen persistente**: monta `/datos/uploads` y define
-  `UPLOADS_DIR=/datos/uploads`. Sin esto, las imágenes subidas desde el panel se
-  pierden en cada despliegue.
+- **Health check path**: `/api/salud` — Coolify comprueba ahí que la web está
+  viva y hablando con la base de datos antes de dar el despliegue por bueno.
+- **Volumen persistente**: origen `/datos/cdb-produccion/uploads` (y
+  `/datos/cdb-test/uploads` en pruebas), destino dentro del contenedor
+  `/datos/uploads`. Después define `UPLOADS_DIR=/datos/uploads`. **Sin este
+  volumen, las imágenes subidas desde el panel desaparecen en cada despliegue.**
 - **HTTPS**: activa el certificado automático de Let's Encrypt.
+- En la aplicación de pruebas, activa además la **autenticación básica** que
+  ofrece Coolify, para que no entre nadie de fuera ni la indexe Google.
 
-En la aplicación de pruebas conviene añadir autenticación básica desde Coolify,
-para que no la vea nadie de fuera ni la indexe Google.
-
-### 3.5. Variables de entorno
+### 4.4. Variables de entorno
 
 Las mismas claves en los dos entornos, con valores distintos:
 
@@ -146,7 +169,7 @@ STRIPE_WEBHOOK_SECRET="whsec_…"
 RESEND_API_KEY="re_…"
 MAIL_FROM="Club Deportivo Bomberos de Madrid <no-responder@clubdeportivobomberos.es>"
 
-# Solo la primera vez, para crear el administrador con `npm run db:seed`
+# Solo para el primer arranque, para crear el administrador
 ADMIN_EMAIL="…"
 ADMIN_PASSWORD="…"
 ```
@@ -157,24 +180,26 @@ Genera cada `AUTH_SECRET` con:
 openssl rand -base64 48
 ```
 
-**Nunca compartas el mismo `AUTH_SECRET` entre pruebas y producción**: si se
-filtra el de pruebas, quedarían expuestas las sesiones de producción.
+**Nunca uses el mismo `AUTH_SECRET` en pruebas y en producción**: si se filtra
+el de pruebas, quedarían expuestas las sesiones de producción.
 
-### 3.6. Primer arranque
+### 4.5. Primer arranque
 
-Con la aplicación ya desplegada, desde la consola que ofrece Coolify:
+Con la aplicación desplegada, desde la consola que ofrece Coolify:
 
 ```bash
 npm run db:seed     # crea el administrador, las secciones y los datos de ejemplo
 ```
 
-En producción, ejecuta el seed una sola vez y después **cambia la contraseña del
-administrador**. Los usuarios de ejemplo (`socio@demo.es` y compañía) hay que
-borrarlos desde el panel antes de abrir la web al público.
+En producción, ejecútalo una sola vez. Después:
+
+1. Entra con el administrador y **cambia la contraseña**.
+2. Borra desde el panel los usuarios de ejemplo (`socio@demo.es`,
+   `participante@demo.es`, `ciclismo@demo.es`).
 
 ---
 
-## 4. Flujo de trabajo
+## 5. Flujo de trabajo
 
 El repositorio tiene tres tipos de rama:
 
@@ -187,19 +212,19 @@ claude/*   ← ramas de trabajo, una por tanda de cambios.
 El ciclo completo:
 
 1. **Trabajamos** en una rama `claude/…`.
-2. **Pull request de `claude/…` a `develop`**. Al fusionarla, Coolify despliega
-   solo en `test.clubdeportivobomberos.es`.
+2. **A `develop`**: al fusionarla, Coolify despliega solo en
+   `test.clubdeportivobomberos.es`.
 3. **Compruebas** en la web de pruebas con calma: inscripciones, pagos con las
    tarjetas de prueba de Stripe, subida de imágenes, correos.
-4. **Pull request de `develop` a `main`**. Al fusionarla, se despliega en
-   producción.
+4. **A `main`**: cuando das el visto bueno, se fusiona `develop` en `main` y se
+   despliega en producción.
 
 Un matiz importante: **no se copian archivos de pruebas a producción**. Lo que
-se promociona es el mismo commit, ya probado, mediante la fusión de ramas. Así
-producción ejecuta exactamente el código que validaste, sin margen para que se
-quede algo por el camino. Las bases de datos, en cambio, están separadas y no se
-copian nunca de un entorno a otro (salvo que quieras llevar una copia de
-producción a pruebas para depurar algo, que se hace con `pg_dump` y `pg_restore`).
+se promociona es el mismo commit ya probado, mediante la fusión de ramas. Así
+producción ejecuta exactamente el código que validaste. Las bases de datos, en
+cambio, están separadas y no se copian nunca de un entorno a otro (salvo que
+quieras llevar una copia de producción a pruebas para depurar algo, que se hace
+con `pg_dump` y `pg_restore`).
 
 ### Cambios en la base de datos
 
@@ -211,11 +236,17 @@ npm run db:migrate      # crea la migración en prisma/migrations/
 ```
 
 Al desplegar, el comando de arranque ejecuta `npm run db:deploy`, que aplica las
-migraciones pendientes. No hay que hacer nada manualmente.
+migraciones pendientes. No hay que hacer nada a mano en el servidor.
+
+### Si algo sale mal
+
+En Coolify, cada despliegue queda guardado y hay un botón de **Rollback** para
+volver al anterior en segundos. Si el problema es de datos, se restaura la copia
+de seguridad de la base.
 
 ---
 
-## 5. Copias de seguridad
+## 6. Copias de seguridad
 
 Lo mínimo antes de abrir al público:
 
@@ -228,9 +259,9 @@ Lo mínimo antes de abrir al público:
 
 ---
 
-## 6. Antes de abrir al público
+## 7. Antes de abrir al público
 
-- [ ] Cambiar la contraseña del administrador y borrar los usuarios de ejemplo.
+- [ ] Contraseña del administrador cambiada y usuarios de ejemplo borrados.
 - [ ] Claves reales de Stripe y webhook apuntando a
       `https://clubdeportivobomberos.es/api/webhooks/stripe`.
 - [ ] Correo del dominio configurado y verificado (SPF, DKIM y DMARC), o las
@@ -238,6 +269,5 @@ Lo mínimo antes de abrir al público:
 - [ ] Textos legales revisados por el asesor del club.
 - [ ] Fotografías reales sustituyendo las ilustraciones provisionales.
 - [ ] Copias de seguridad activadas y probadas.
-- [ ] La web de pruebas protegida con contraseña y con `noindex`.
-- [ ] Dar de alta el dominio en Google Search Console para que indexe la web y
-      recoja el favicon.
+- [ ] Web de pruebas protegida con contraseña.
+- [ ] Dominio dado de alta en Google Search Console.

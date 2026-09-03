@@ -3,6 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { legalPages } from "@/lib/legal";
 
+/**
+ * El mapa del sitio consulta la base de datos, así que se genera al recibir la
+ * petición y no al compilar. De lo contrario el despliegue exigiría tener la
+ * base de datos accesible durante la compilación.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [sections, posts, events, products] = await Promise.all([
     prisma.section.findMany({ where: { active: true }, select: { slug: true } }),

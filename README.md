@@ -166,7 +166,21 @@ bases de datos, las copias de seguridad y el flujo de trabajo, está en
 **[DESPLIEGUE.md](DESPLIEGUE.md)**.
 
 En resumen: cualquier servidor con Node 20.9+, PostgreSQL y un disco persistente
-para `UPLOADS_DIR`. El arranque en el servidor es `npm run db:deploy && npm start`.
+para `UPLOADS_DIR`. El arranque en el servidor es `npm run db:deploy && npm start`
+y la comprobación de estado está en `/api/salud` (responde 200 si la web habla
+con la base de datos, 503 si no). La compilación no necesita base de datos.
+
+### Ramas
+
+| Rama | Entorno |
+| --- | --- |
+| `main` | Producción |
+| `develop` | Pruebas |
+| `claude/…` | Trabajo en curso |
+
+Los cambios van de una rama de trabajo a `develop`, se prueban en el entorno de
+pruebas y de ahí a `main`. Nunca se copian archivos de un entorno a otro: se
+promociona el mismo commit ya validado.
 
 ## Estructura
 
