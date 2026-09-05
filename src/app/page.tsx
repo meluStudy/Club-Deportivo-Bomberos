@@ -45,10 +45,10 @@ export default async function HomePage() {
           />
           {lead && (
             <div className="grid gap-6 lg:grid-cols-12">
-              <Reveal className="lg:col-span-7">
+              <Reveal className="min-w-0 lg:col-span-7">
                 <PostCard post={lead} large />
               </Reveal>
-              <Stagger className="grid gap-6 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
+              <Stagger className="min-w-0 grid gap-6 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
                 {rest.slice(0, 2).map((p) => (
                   <StaggerItem key={p.id}>
                     <PostCard post={p} />
@@ -98,7 +98,7 @@ export default async function HomePage() {
               </ButtonLink>
             }
           />
-          <Stagger className="grid gap-6 lg:grid-cols-3">
+          <Stagger className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((e) => (
               <StaggerItem key={e.id}>
                 <EventCard event={e} />
@@ -168,7 +168,7 @@ export default async function HomePage() {
               </ButtonLink>
             }
           />
-          <Stagger className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          <Stagger className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {products.map((p) => (
               <StaggerItem key={p.id}>
                 <ProductCard product={p} isMember={Boolean(membership)} />

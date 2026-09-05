@@ -88,7 +88,7 @@ export function Footer({ sections }: { sections: { slug: string; name: string }[
           </li>
           <li className="flex items-center gap-2">
             <Mail className="size-4 shrink-0 text-brand-500" />
-            <a href={`mailto:${site.email}`} className="hover:text-white">
+            <a href={`mailto:${site.email}`} className="break-all py-1 hover:text-white">
               {site.email}
             </a>
           </li>
@@ -111,7 +111,7 @@ function FooterCol({ title, children, className }: { title: string; children: Re
   return (
     <div className={className}>
       <h3 className="mb-4 font-display text-sm font-bold uppercase tracking-[0.2em] text-white">{title}</h3>
-      <ul className="space-y-2.5 text-sm">{children}</ul>
+      <ul className="space-y-1 text-sm sm:space-y-1.5">{children}</ul>
     </div>
   );
 }
@@ -119,7 +119,7 @@ function FooterCol({ title, children, className }: { title: string; children: Re
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
-      <Link href={href} className="transition hover:text-white hover:underline hover:underline-offset-4">
+      <Link href={href} className="-my-0.5 inline-block py-1.5 transition hover:text-white hover:underline hover:underline-offset-4">
         {children}
       </Link>
     </li>

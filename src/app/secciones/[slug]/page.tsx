@@ -34,14 +34,14 @@ export default async function SectionPage({ params }: Props) {
       </PageHero>
 
       <Container className="grid gap-12 py-16 lg:grid-cols-12">
-        <Reveal className="lg:col-span-7">
+        <Reveal className="min-w-0 lg:col-span-7">
           <div className="mb-6 inline-flex size-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-glow">
             <SectionIcon slug={section.slug} className="size-8" />
           </div>
           <Markdown content={section.description} className="text-lg" />
         </Reveal>
 
-        <aside className="space-y-6 lg:col-span-5">
+        <aside className="min-w-0 space-y-6 lg:col-span-5">
           <Reveal className="rounded-2xl border border-ink-100 bg-ink-50 p-6">
             <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold uppercase">
               <Clock className="size-5 text-brand-600" /> Horarios de entrenamiento
@@ -74,7 +74,7 @@ export default async function SectionPage({ params }: Props) {
         <section className="bg-ink-50 py-16">
           <Container>
             <h2 className="mb-8 text-4xl font-extrabold uppercase">Próximos eventos de {section.name}</h2>
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {section.events.map((e) => (
                 <EventCard key={e.id} event={{ ...e, section: { name: section.name, slug: section.slug } }} />
               ))}
@@ -87,7 +87,7 @@ export default async function SectionPage({ params }: Props) {
         <section className="py-16">
           <Container>
             <h2 className="mb-8 text-4xl font-extrabold uppercase">Noticias de {section.name}</h2>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {section.posts.map((p) => (
                 <PostCard key={p.id} post={{ ...p, section: { name: section.name, slug: section.slug } }} />
               ))}

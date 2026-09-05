@@ -58,11 +58,11 @@ export function RegisterForm({ next }: { next?: string }) {
         </Field>
       </div>
       <label className="flex items-start gap-3 text-sm text-ink-700">
-        <input type="checkbox" name="isFirefighter" className="mt-1 size-4 accent-brand-600" />
+        <input type="checkbox" name="isFirefighter" className="mt-0.5 size-5 accent-brand-600 sm:mt-1 sm:size-4" />
         <span>Soy miembro del Cuerpo de Bomberos del Ayuntamiento de Madrid (en activo o jubilado)</span>
       </label>
       <label className="flex items-start gap-3 text-sm text-ink-700">
-        <input type="checkbox" name="acceptTerms" className="mt-1 size-4 accent-brand-600" />
+        <input type="checkbox" name="acceptTerms" className="mt-0.5 size-5 accent-brand-600 sm:mt-1 sm:size-4" />
         <span>
           Acepto los <Link href="/legal/terminos" className="underline">términos y condiciones</Link> y la <Link href="/legal/privacidad" className="underline">política de privacidad</Link>.
         </span>

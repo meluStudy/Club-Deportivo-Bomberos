@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +18,9 @@ const variants = {
 } as const;
 
 const sizes = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-base",
-  lg: "h-13 px-8 text-lg",
+  sm: "h-10 px-4 text-sm",
+  md: "h-12 px-6 text-base",
+  lg: "h-14 px-8 text-lg",
 } as const;
 
 type BaseProps = {
@@ -35,14 +35,24 @@ type ButtonProps = BaseProps & Omit<HTMLMotionProps<"button">, "children">;
 type LinkProps = BaseProps & { href: string; target?: string; rel?: string };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-display font-semibold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60";
+  "relative inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-full font-display font-semibold uppercase tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60";
 
-const tap = { whileTap: { scale: 0.96 }, whileHover: { scale: 1.02 }, transition: { type: "spring", stiffness: 500, damping: 30 } } as const;
+/** Respuesta al pulsar: un hundimiento breve con muelle, que se nota en el móvil. */
+function useGesto() {
+  const quieto = useReducedMotion();
+  if (quieto) return {};
+  return {
+    whileTap: { scale: 0.955 },
+    whileHover: { scale: 1.025 },
+    transition: { type: "spring" as const, stiffness: 520, damping: 24, mass: 0.5 },
+  };
+}
 
 export function Button({ variant = "primary", size = "md", loading, className, children, ...props }: ButtonProps) {
+  const gesto = useGesto();
   return (
     <motion.button
-      {...tap}
+      {...gesto}
       className={cn(base, variants[variant], sizes[size], className)}
       disabled={loading || props.disabled}
       {...props}
@@ -54,8 +64,9 @@ export function Button({ variant = "primary", size = "md", loading, className, c
 }
 
 export function ButtonLink({ variant = "primary", size = "md", className, children, href, ...rest }: LinkProps) {
+  const gesto = useGesto();
   return (
-    <motion.span {...tap} className="inline-flex">
+    <motion.span {...gesto} className="inline-flex">
       <Link href={href} className={cn(base, variants[variant], sizes[size], className)} {...rest}>
         {children}
       </Link>

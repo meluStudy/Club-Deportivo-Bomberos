@@ -33,7 +33,7 @@ export default async function PostPage({ params }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 to-ink-950/30" aria-hidden />
         <Container className="relative py-24 sm:py-32">
           <Reveal>
-            <Link href="/actualidad" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-300 hover:text-white">
+            <Link href="/actualidad" className="mb-6 -ml-1 inline-flex items-center gap-2 px-1 py-2 text-sm text-ink-300 hover:text-white">
               <ArrowLeft className="size-4" /> Volver a actualidad
             </Link>
             <div className="flex flex-wrap items-center gap-3">
@@ -47,14 +47,14 @@ export default async function PostPage({ params }: Props) {
       </div>
 
       <Container className="grid gap-12 py-16 lg:grid-cols-12">
-        <Reveal className="lg:col-span-8">
+        <Reveal className="min-w-0 lg:col-span-8">
           <Markdown content={post.content} className="text-lg" />
           <div className="mt-10 flex items-center justify-between border-t border-ink-100 pt-6 text-sm text-ink-500">
             <span>{post.author?.name ? `Publicado por ${post.author.name}` : "Club Deportivo Bomberos de Madrid"}</span>
             <span className="inline-flex items-center gap-2"><Share2 className="size-4" /> Compartir</span>
           </div>
         </Reveal>
-        <aside className="lg:col-span-4">
+        <aside className="min-w-0 lg:col-span-4">
           <h2 className="mb-4 text-2xl font-bold uppercase">Más noticias</h2>
           <div className="grid gap-4">
             {related.map((p) => (

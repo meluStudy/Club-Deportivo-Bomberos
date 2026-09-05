@@ -31,7 +31,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
             <Chip key={c} href={`/tienda?categoria=${encodeURIComponent(c)}`} active={categoria === c}>{c}</Chip>
           ))}
         </nav>
-        <Stagger className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        <Stagger className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {products.map((p) => (
             <StaggerItem key={p.id}>
               <ProductCard product={p} isMember={Boolean(membership)} />

@@ -51,8 +51,8 @@ function PostForm({ sections, post, admin }: { sections: { id: string; name: str
       <ImageField name="image" label="Imagen de portada" defaultValue={post?.coverImage} />
       <Field label="Entradilla" name="excerpt" className="sm:col-span-2"><input id="excerpt" name="excerpt" defaultValue={post?.excerpt} required className={inputClass} /></Field>
       <Field label="Contenido (markdown sencillo: ## títulos, **negrita**, listas con -)" name="content" className="sm:col-span-2"><textarea id="content" name="content" defaultValue={post?.content} required className={`${textareaClass} min-h-64`} /></Field>
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={post?.featured} className="size-4 accent-brand-600" /> Destacar en portada</label>
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" defaultChecked={post ? Boolean(post.publishedAt) : true} className="size-4 accent-brand-600" /> Publicada</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={post?.featured} className="size-5 accent-brand-600 sm:size-4" /> Destacar en portada</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" defaultChecked={post ? Boolean(post.publishedAt) : true} className="size-5 accent-brand-600 sm:size-4" /> Publicada</label>
       <div className="sm:col-span-2"><button className={smallBtn}>{post ? "Guardar cambios" : "Publicar noticia"}</button></div>
     </form>
   );

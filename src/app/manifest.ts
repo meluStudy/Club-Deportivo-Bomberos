@@ -11,10 +11,17 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#0b0b0d",
     theme_color: "#e10600",
     lang: "es-ES",
+    orientation: "portrait",
+    categories: ["sports"],
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
       { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
+    shortcuts: [
+      { name: "Eventos", short_name: "Eventos", url: "/eventos", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
+      { name: "Mi cuenta", short_name: "Cuenta", url: "/cuenta", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
+      { name: "Tienda oficial", short_name: "Tienda", url: "/tienda", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
     ],
   };
 }

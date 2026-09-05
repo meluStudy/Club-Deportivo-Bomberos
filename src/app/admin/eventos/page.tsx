@@ -57,7 +57,7 @@ export default async function AdminEvents({ searchParams }: { searchParams: Prom
           <Field label="Precio socios (€, opcional)" name="memberPrice"><input id="memberPrice" name="memberPrice" type="number" step="0.01" min={0} className={inputClass} /></Field>
           <Field label="Plazas (vacío = ilimitadas)" name="capacity"><input id="capacity" name="capacity" type="number" min={1} className={inputClass} /></Field>
           <Field label="Descripción corta (tarjetas y listados)" name="description" className="sm:col-span-2"><textarea id="description" name="description" className={textareaClass} /></Field>
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" className="size-4 accent-brand-600" /> Publicar ya (si no, queda como borrador visible solo para el panel)</label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" className="size-5 accent-brand-600 sm:size-4" /> Publicar ya (si no, queda como borrador visible solo para el panel)</label>
           <div className="sm:col-span-2"><button className={smallBtn}>Crear evento y abrir editor</button></div>
         </form>
       </Details>

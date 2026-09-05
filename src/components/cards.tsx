@@ -79,7 +79,7 @@ export function EventCard({ event }: EventCardProps) {
           <img src={event.coverImage ?? "/images/hero.svg"} alt="" className="h-full w-full object-cover" />
           <div className="absolute left-4 top-4 flex flex-col items-center rounded-xl bg-white px-3 py-2 text-ink-950 shadow-lg">
             <span className="font-display text-3xl font-extrabold leading-none">{date.getDate()}</span>
-            <span className="text-[11px] font-bold uppercase tracking-wider">{formatDate(date, { month: "short" })}</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{formatDate(date, { month: "short" })}</span>
           </div>
         </div>
         <div className="flex flex-1 flex-col p-5">

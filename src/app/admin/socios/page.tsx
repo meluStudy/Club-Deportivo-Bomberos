@@ -70,7 +70,7 @@ export default async function AdminMembers({ searchParams }: { searchParams: Pro
         <form action={enviarAvisosRenovacionAction} className="mt-5 flex flex-wrap items-center gap-4">
           <input type="hidden" name="temporada" value={season} />
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="soloSinAviso" defaultChecked className="size-4 accent-brand-600" />
+            <input type="checkbox" name="soloSinAviso" defaultChecked className="size-5 accent-brand-600 sm:size-4" />
             Enviar solo a quien no haya recibido aviso todavía
           </label>
           <button className={smallBtn} disabled={pendientesRenovar.length === 0}>

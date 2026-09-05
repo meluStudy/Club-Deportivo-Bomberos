@@ -166,6 +166,21 @@ El script está en `scripts/generar-imagenes.ts` y los pictogramas en `src/lib/p
 - Secciones: `public/images/sections/<slug>.svg` (puede ser `.jpg`/`.png` cambiando la ruta desde el seed o el panel).
 - Noticias, eventos y productos: se editan desde el panel indicando la ruta o URL de la imagen.
 
+## En el móvil
+
+- **Se instala como aplicación.** Al segundo rato navegando desde un móvil, la web ofrece añadirse a la pantalla de inicio. En Android usa el aviso del propio navegador; en iPhone, donde Safari no lo permite, explica los dos pasos con los iconos reales de la barra. Quien lo descarte no vuelve a verlo hasta pasadas dos semanas, y si pulsa «no volver a mostrar», nunca más.
+- **Atajos.** Una vez instalada, mantener pulsado el icono abre accesos directos a Eventos, Mi cuenta y Tienda.
+- **Comprobado sin desbordes** en 320, 390 y 820 píxeles de ancho en todas las páginas, con las zonas pulsables a tamaño cómodo para el dedo.
+
+## Animaciones
+
+Todas respetan la preferencia del sistema: quien tenga activado «reducir movimiento» en su móvil u ordenador no verá ninguna. Se controla desde un único sitio (`components/layout/motion.tsx`).
+
+- **Barra de progreso al navegar**: aparece al pulsar un enlace y se completa al llegar. Sin ella, en el móvil parece que la web no responde mientras carga.
+- **Portada**: la imagen de fondo se mueve más despacio que el texto, el titular entra por líneas y las cifras cuentan desde cero al aparecer.
+- **Botones y tarjetas**: se hunden ligeramente al pulsarlos, con muelle. Es lo que da la sensación de que responden en una pantalla táctil.
+- **Al bajar por la página**: los bloques aparecen escalonados desde `components/ui/reveal.tsx`, que ofrece cuatro direcciones y un contenedor para encadenar hijos.
+
 ## Enseñar la web antes de contratar servidor
 
 Se puede publicar una demo gratuita con cuentas de prueba, sin pagar nada y en

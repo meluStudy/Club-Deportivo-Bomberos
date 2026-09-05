@@ -43,19 +43,19 @@ export function Header({ user }: { user: SessionUser | null }) {
   return (
     <>
       <div className="bg-ink-950 text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1 text-xs sm:px-6 lg:px-8">
           <p className="hidden font-display uppercase tracking-widest text-ink-300 sm:block">Club Agrupación Deportiva Atlética Bomberos de Madrid · Desde 1985</p>
           <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
-            <Link href="/socios" className="font-semibold text-brand-400 hover:text-white">
+            <Link href="/socios" className="-my-1 py-2 font-semibold text-brand-400 hover:text-white">
               Hazte socio →
             </Link>
             {user ? (
-              <Link href={user.role === "ADMIN" ? "/admin" : "/cuenta"} className="flex items-center gap-1.5 hover:text-brand-400">
+              <Link href={user.role === "ADMIN" ? "/admin" : "/cuenta"} className="-my-1 flex items-center gap-1.5 py-2 hover:text-brand-400">
                 {user.role === "ADMIN" ? <LayoutDashboard className="size-3.5" /> : <User className="size-3.5" />}
                 {user.name.split(" ")[0]}
               </Link>
             ) : (
-              <Link href="/login" className="flex items-center gap-1.5 hover:text-brand-400">
+              <Link href="/login" className="-my-1 flex items-center gap-1.5 py-2 hover:text-brand-400">
                 <LogIn className="size-3.5" /> Acceder
               </Link>
             )}

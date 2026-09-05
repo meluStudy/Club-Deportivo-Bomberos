@@ -83,7 +83,7 @@ function ProductForm({ product }: { product?: { id: string; name: string; slug: 
       <Field label="Variantes (una por línea: Talla | Color | Stock)" name="variants" className="sm:col-span-2" hint="Ejemplo: M | Rojo | 20. Las variantes existentes con el mismo talla/color se actualizan.">
         <textarea id="variants" name="variants" className={textareaClass} placeholder={"S | Rojo | 10\nM | Rojo | 15\nL | Rojo | 15"} />
       </Field>
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={product?.featured} className="size-4 accent-brand-600" /> Destacar en portada</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={product?.featured} className="size-5 accent-brand-600 sm:size-4" /> Destacar en portada</label>
       <div className="sm:col-span-2"><button className={smallBtn}>{product ? "Guardar cambios" : "Crear producto"}</button></div>
     </form>
   );

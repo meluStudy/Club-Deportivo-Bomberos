@@ -57,7 +57,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             {sp.error === "plan" && <Alert tone="error">La modalidad seleccionada no está disponible.</Alert>}
             {membership && <Alert tone="success">Ya eres socio de la temporada {membership.season} (nº {membership.memberNumber}). Puedes renovar desde <Link href="/cuenta" className="underline">tu cuenta</Link>.</Alert>}
           </div>
-          <Stagger className="grid gap-6 lg:grid-cols-3">
+          <Stagger className="grid gap-6 md:grid-cols-3">
             {plans.map((plan, i) => {
               const benefits = parseJson<string[]>(plan.benefits, []);
               const highlight = i === 0;

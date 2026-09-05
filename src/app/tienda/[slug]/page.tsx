@@ -32,7 +32,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <Container className="py-10 sm:py-16">
-      <Link href="/tienda" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-500 hover:text-brand-600">
+      <Link href="/tienda" className="mb-6 -ml-1 inline-flex items-center gap-2 px-1 py-2 text-sm text-ink-500 hover:text-brand-600">
         <ArrowLeft className="size-4" /> Volver a la tienda
       </Link>
       <div className="grid gap-10 lg:grid-cols-2">
@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: Props) {
       {related.length > 0 && (
         <section className="mt-20">
           <h2 className="mb-6 text-3xl font-extrabold uppercase">También te puede interesar</h2>
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} isMember={isMember} />
             ))}

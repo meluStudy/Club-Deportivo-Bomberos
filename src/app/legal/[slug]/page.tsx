@@ -28,7 +28,7 @@ export default async function LegalPage({ params }: Props) {
     <>
       <PageHero eyebrow="Información legal" title={page.title} description={`Última actualización: ${page.updated}`} />
       <Container className="grid gap-12 py-16 lg:grid-cols-12">
-        <nav className="lg:col-span-3" aria-label="Páginas legales">
+        <nav className="min-w-0 lg:col-span-3" aria-label="Páginas legales">
           <ul className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:gap-1">
             {legalPages.map((p) => (
               <li key={p.slug}>
@@ -39,7 +39,7 @@ export default async function LegalPage({ params }: Props) {
             ))}
           </ul>
         </nav>
-        <Reveal className="lg:col-span-8">
+        <Reveal className="min-w-0 lg:col-span-8">
           <Markdown content={page.content} />
         </Reveal>
       </Container>

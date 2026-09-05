@@ -33,7 +33,7 @@ export function ContactForm() {
       </Field>
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
       <label className="flex items-start gap-3 text-sm text-ink-700">
-        <input type="checkbox" name="acceptPrivacy" className="mt-1 size-4 accent-brand-600" />
+        <input type="checkbox" name="acceptPrivacy" className="mt-0.5 size-5 accent-brand-600 sm:mt-1 sm:size-4" />
         <span>
           He leído y acepto la <Link href="/legal/privacidad" className="underline">política de privacidad</Link>.
         </span>

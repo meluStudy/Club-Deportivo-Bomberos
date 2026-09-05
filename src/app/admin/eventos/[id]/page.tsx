@@ -106,7 +106,7 @@ export default async function AdminEventEditor({ params, searchParams }: { param
             <ImageField name="image" label="Imagen de tarjeta" defaultValue={event.coverImage} hint="Se ve en los listados y en la portada." />
             <ImageField name="heroImage" label="Imagen de cabecera de la microweb" defaultValue={event.heroImage} hint="Si se deja vacía se usa la de tarjeta." />
             <Field label="Descripción corta (tarjetas y listados)" name="description" className="sm:col-span-2"><textarea id="description" name="description" defaultValue={event.description} className={textareaClass} /></Field>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" defaultChecked={event.published} className="size-4 accent-brand-600" /> Publicado (visible para todo el mundo)</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="published" defaultChecked={event.published} className="size-5 accent-brand-600 sm:size-4" /> Publicado (visible para todo el mundo)</label>
             <div className="sm:col-span-2"><button className={smallBtn}>Guardar ficha</button></div>
           </form>
         )}
@@ -163,7 +163,7 @@ export default async function AdminEventEditor({ params, searchParams }: { param
               <div className="grid gap-2 sm:grid-cols-2">
                 {Object.entries(CAMPOS_PARTICIPANTE).map(([clave, cfg]) => (
                   <label key={clave} className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" name={`campo_${clave}`} defaultChecked={parseJson<string[]>(event.requiredFields, []).includes(clave)} className="size-4 accent-brand-600" />
+                    <input type="checkbox" name={`campo_${clave}`} defaultChecked={parseJson<string[]>(event.requiredFields, []).includes(clave)} className="size-5 accent-brand-600 sm:size-4" />
                     {cfg.label}
                   </label>
                 ))}
@@ -316,7 +316,7 @@ function TicketForm({ eventId, ticket }: { eventId: string; ticket?: { id: strin
       <Field label="Precio socios (€, opcional)" name="memberPrice"><input name="memberPrice" type="number" step="0.01" min={0} defaultValue={ticket?.memberPriceCents != null ? ticket.memberPriceCents / 100 : ""} className={inputClass} /></Field>
       <Field label="Plazas de esta modalidad (vacío = sin límite)" name="capacity"><input name="capacity" type="number" min={1} defaultValue={ticket?.capacity ?? ""} className={inputClass} /></Field>
       <Field label="Orden" name="order"><input name="order" type="number" min={0} defaultValue={ticket?.order ?? ""} className={inputClass} /></Field>
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="active" defaultChecked={ticket?.active ?? true} className="size-4 accent-brand-600" /> Visible en la web</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="active" defaultChecked={ticket?.active ?? true} className="size-5 accent-brand-600 sm:size-4" /> Visible en la web</label>
       <div className="sm:col-span-2"><button className={smallBtn}>{ticket ? "Guardar modalidad" : "Añadir modalidad"}</button></div>
     </form>
   );

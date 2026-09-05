@@ -54,11 +54,11 @@ export function CheckoutForm({ user, isMember }: { user: { name: string; email: 
 
   return (
     <form onSubmit={onSubmit} className="grid gap-10 lg:grid-cols-12">
-      <div className="space-y-8 lg:col-span-7">
+      <div className="min-w-0 space-y-8 lg:col-span-7">
         <section className="rounded-2xl border border-ink-100 p-6">
           <h2 className="mb-5 text-2xl font-bold uppercase">Tus datos</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Nombre y apellidos" name="fullName" error={errors.fullName} className="sm:col-span-2">
+            <Field label="Nombre y apellidos" name="fullName" error={errors.fullName} className="min-w-0 sm:col-span-2">
               <input id="fullName" name="fullName" defaultValue={user?.name} required className={inputClass} />
             </Field>
             <Field label="Correo electrónico" name="email" error={errors.email}>
@@ -78,13 +78,13 @@ export function CheckoutForm({ user, isMember }: { user: { name: string; email: 
           </div>
           {shipping === "envio" && (
             <div className="mt-5 grid gap-4 sm:grid-cols-3">
-              <Field label="Dirección" name="address" error={errors.address} className="sm:col-span-3">
+              <Field label="Dirección" name="address" error={errors.address} className="min-w-0 sm:col-span-3">
                 <input id="address" name="address" className={inputClass} required />
               </Field>
               <Field label="Código postal" name="postalCode">
                 <input id="postalCode" name="postalCode" className={inputClass} required />
               </Field>
-              <Field label="Ciudad" name="city" className="sm:col-span-2">
+              <Field label="Ciudad" name="city" className="min-w-0 sm:col-span-2">
                 <input id="city" name="city" className={inputClass} required />
               </Field>
             </div>
@@ -92,7 +92,7 @@ export function CheckoutForm({ user, isMember }: { user: { name: string; email: 
         </section>
       </div>
 
-      <aside className="lg:col-span-5">
+      <aside className="min-w-0 lg:col-span-5">
         <div className="sticky top-24 rounded-2xl bg-ink-950 p-6 text-white">
           <h2 className="mb-4 text-2xl font-bold uppercase">Resumen</h2>
           <ul className="divide-y divide-white/10">

@@ -11,7 +11,7 @@ export function DemoBanner() {
         <span className="inline-flex items-center gap-1.5">
           <FlaskConical className="size-4" /> Web de demostración: los pagos son simulados y los datos, de ejemplo.
         </span>
-        <Link href="/demo" className="underline underline-offset-2 hover:text-brand-700">
+        <Link href="/demo" className="-my-1 py-1.5 underline underline-offset-2 hover:text-brand-700">
           Ver cuentas de prueba
         </Link>
       </div>

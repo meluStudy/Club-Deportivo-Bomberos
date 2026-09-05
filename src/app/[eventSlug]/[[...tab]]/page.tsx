@@ -273,10 +273,10 @@ export default async function EventMicrosite({ params, searchParams }: Props) {
             <Reveal className="rounded-2xl bg-ink-950 p-6 text-white">
               <h2 className="mb-4 text-2xl font-bold uppercase">Organización</h2>
               <ul className="space-y-3 text-ink-200">
-                <li className="flex items-center gap-3"><UserRound className="size-5 text-brand-500" /> {event.contactName ?? (event.section ? `Sección de ${event.section.name}` : site.name)}</li>
-                <li className="flex items-center gap-3"><Mail className="size-5 text-brand-500" /> <a href={`mailto:${event.contactEmail ?? event.section?.contactEmail ?? site.email}`} className="hover:text-white">{event.contactEmail ?? event.section?.contactEmail ?? site.email}</a></li>
+                <li className="flex items-start gap-3"><UserRound className="mt-0.5 size-5 shrink-0 text-brand-500" /> {event.contactName ?? (event.section ? `Sección de ${event.section.name}` : site.name)}</li>
+                <li className="flex items-start gap-3"><Mail className="mt-0.5 size-5 shrink-0 text-brand-500" /> <a href={`mailto:${event.contactEmail ?? event.section?.contactEmail ?? site.email}`} className="break-all hover:text-white">{event.contactEmail ?? event.section?.contactEmail ?? site.email}</a></li>
                 {event.contactPhone && (
-                  <li className="flex items-center gap-3"><Phone className="size-5 text-brand-500" /> <a href={`tel:${event.contactPhone.replace(/\s/g, "")}`} className="hover:text-white">{event.contactPhone}</a></li>
+                  <li className="flex items-start gap-3"><Phone className="mt-0.5 size-5 shrink-0 text-brand-500" /> <a href={`tel:${event.contactPhone.replace(/\s/g, "")}`} className="hover:text-white">{event.contactPhone}</a></li>
                 )}
                 <li className="flex items-start gap-3"><MapPin className="mt-0.5 size-5 text-brand-500" /> {event.location}</li>
               </ul>

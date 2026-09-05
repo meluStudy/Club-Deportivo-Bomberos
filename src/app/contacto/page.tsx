@@ -14,16 +14,16 @@ export default function ContactPage() {
     <>
       <PageHero eyebrow="Contacto" title="Hablemos" description="¿Quieres unirte, colaborar, patrocinar o simplemente saber más? Escríbenos y te responderemos lo antes posible." />
       <Container className="grid gap-12 py-16 lg:grid-cols-12">
-        <Reveal className="lg:col-span-7">
+        <Reveal className="min-w-0 lg:col-span-7">
           <h2 className="mb-6 text-3xl font-extrabold uppercase">Envíanos un mensaje</h2>
           <ContactForm />
         </Reveal>
-        <aside className="space-y-6 lg:col-span-5">
+        <aside className="min-w-0 space-y-6 lg:col-span-5">
           <Reveal className="rounded-2xl bg-ink-950 p-6 text-white" delay={0.1}>
             <h2 className="mb-5 text-2xl font-bold uppercase">Datos de contacto</h2>
             <ul className="space-y-4 text-ink-200">
               <li className="flex items-start gap-3"><MapPin className="mt-0.5 size-5 shrink-0 text-brand-500" /><span>{fullAddress}</span></li>
-              <li className="flex items-center gap-3"><Mail className="size-5 shrink-0 text-brand-500" /><a href={`mailto:${site.email}`} className="hover:text-white">{site.email}</a></li>
+              <li className="flex items-center gap-3"><Mail className="size-5 shrink-0 text-brand-500" /><a href={`mailto:${site.email}`} className="break-all hover:text-white">{site.email}</a></li>
               <li className="flex items-start gap-3"><Clock className="mt-0.5 size-5 shrink-0 text-brand-500" /><span>Secretaría: lunes a viernes, 17:00 - 20:00</span></li>
             </ul>
           </Reveal>

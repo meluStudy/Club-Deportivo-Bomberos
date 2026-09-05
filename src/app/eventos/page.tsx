@@ -20,7 +20,7 @@ export default async function EventsPage() {
         {upcoming.length === 0 ? (
           <p className="text-ink-500">No hay eventos programados en este momento.</p>
         ) : (
-          <Stagger className="grid gap-6 lg:grid-cols-2">
+          <Stagger className="grid gap-6 md:grid-cols-2">
             {upcoming.map((e) => (
               <StaggerItem key={e.id}>
                 <EventCard event={e} />

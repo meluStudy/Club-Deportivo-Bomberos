@@ -43,7 +43,7 @@ export default function DemoPage() {
           </p>
         </Reveal>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {cuentasDemo.map((c, i) => (
             <Reveal key={c.email} delay={i * 0.05} className="rounded-2xl border border-ink-100 p-6 shadow-card">
               <h3 className="text-2xl font-bold uppercase">{c.rol}</h3>

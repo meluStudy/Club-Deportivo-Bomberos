@@ -64,7 +64,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
 
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Carné */}
-        <Reveal className="lg:col-span-5">
+        <Reveal className="min-w-0 lg:col-span-5">
           <div className="relative overflow-hidden rounded-3xl bg-ink-950 p-7 text-white shadow-glow">
             <div className="absolute inset-0 bg-stripes" aria-hidden />
             <div className="absolute -right-16 -top-16 size-56 rounded-full bg-brand-600/40 blur-2xl" aria-hidden />
@@ -129,7 +129,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           )}
         </Reveal>
 
-        <div className="space-y-8 lg:col-span-7">
+        <div className="min-w-0 space-y-8 lg:col-span-7">
           <Reveal className="rounded-2xl border border-ink-100 p-6" delay={0.1}>
             <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold uppercase"><Ticket className="size-5 text-brand-600" /> Mis inscripciones</h2>
             {registrations.length === 0 ? (
