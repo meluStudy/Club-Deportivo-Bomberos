@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CookieBanner } from "@/components/layout/cookie-banner";
+import { DemoBanner } from "@/components/layout/demo-banner";
 import { CartProvider } from "@/components/cart/cart-context";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { StructuredData } from "@/components/structured-data";
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-full flex-col">
         <StructuredData />
         <CartProvider>
+          <DemoBanner />
           <Header user={session} />
           <main className="flex flex-1 flex-col">{children}</main>
           <Footer sections={sections} />

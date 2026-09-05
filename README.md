@@ -143,7 +143,14 @@ Para que el favicon salga en Google hace falta, además de los archivos: que el 
 
 ## Imágenes subidas desde el panel
 
-Los formularios de eventos, noticias y productos permiten arrastrar una imagen o elegirla del disco. Se recorta a 2000 píxeles como máximo, se convierte a WebP y se guarda en la carpeta `uploads/` (fuera de `public/`, para que sobreviva a los despliegues). Se sirven por la ruta `/media`. En producción conviene apuntar `UPLOADS_DIR` a un disco persistente, por ejemplo `/var/www/cdb/uploads`. En plataformas sin disco (Vercel y similares) hay que cambiar la escritura por un almacenamiento externo tipo S3 o R2: solo cambia el final de `src/app/api/uploads/route.ts`.
+Los formularios de eventos, noticias y productos permiten arrastrar una imagen o elegirla del disco. Se recorta a 2000 píxeles como máximo, se convierte a WebP y se sirve por la ruta `/media`. Dónde se guarda lo decide `MEDIA_STORAGE`:
+
+| Valor | Dónde guarda | Cuándo usarlo |
+| --- | --- | --- |
+| `disco` (por defecto) | Carpeta `UPLOADS_DIR`, fuera de `public/` | VPS o cualquier servidor con disco persistente |
+| `base-datos` | Dentro de PostgreSQL | Alojamientos sin disco, como Vercel o Netlify |
+
+En un VPS, apunta `UPLOADS_DIR` a un disco persistente (por ejemplo `/datos/uploads`) y monta ahí un volumen.
 
 ### Ilustraciones provisionales
 
@@ -158,6 +165,13 @@ El script está en `scripts/generar-imagenes.ts` y los pictogramas en `src/lib/p
 - Portada: `public/images/hero.svg`.
 - Secciones: `public/images/sections/<slug>.svg` (puede ser `.jpg`/`.png` cambiando la ruta desde el seed o el panel).
 - Noticias, eventos y productos: se editan desde el panel indicando la ruta o URL de la imagen.
+
+## Enseñar la web antes de contratar servidor
+
+Se puede publicar una demo gratuita con cuentas de prueba, sin pagar nada y en
+unos quince minutos: **[DEMO.md](DEMO.md)**. Con `DEMO_MODE="1"` la web muestra
+un aviso permanente de que los pagos son simulados y una página `/demo` con las
+cuentas de ejemplo y un recorrido por lo que hace.
 
 ## Despliegue
 

@@ -1,23 +1,18 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { requireStaff } from "@/lib/auth";
 import { consumirIntento, ipDelCliente } from "@/lib/rate-limit";
-import { carpetaSubidas, urlSubida } from "@/lib/uploads";
+import { guardarImagen, urlSubida } from "@/lib/uploads";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const TIPOS = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
 /**
  * Subida de imágenes desde el panel. La imagen se redimensiona y se convierte
- * a WebP para que la web cargue rápido, y se guarda en la carpeta de subidas
- * (ver `lib/uploads.ts`), que está fuera de `public/` para que sobreviva a los
- * despliegues. Las imágenes se sirven por la ruta /media.
- *
- * En plataformas sin disco persistente (Vercel y similares) hay que sustituir
- * la escritura en disco por un almacenamiento externo tipo S3 o R2.
+ * a WebP para que la web cargue rápido, y se guarda donde indique
+ * MEDIA_STORAGE: en disco (VPS) o en la base de datos (alojamientos sin disco
+ * persistente). Se sirven por la ruta /media.
  */
 export async function POST(req: Request) {
   const staff = await requireStaff();
@@ -53,9 +48,8 @@ export async function POST(req: Request) {
   const ahora = new Date();
   const carpeta = `${ahora.getFullYear()}/${String(ahora.getMonth() + 1).padStart(2, "0")}`;
   const nombre = `${createHash("sha1").update(procesada).digest("hex").slice(0, 16)}.webp`;
-  const destino = join(carpetaSubidas(), carpeta);
-  await mkdir(destino, { recursive: true });
-  await writeFile(join(destino, nombre), procesada);
+  const relativa = `${carpeta}/${nombre}`;
+  await guardarImagen(relativa, procesada, { tipo: "image/webp", ancho, alto });
 
-  return NextResponse.json({ url: urlSubida(`${carpeta}/${nombre}`), width: ancho, height: alto, size: procesada.length });
+  return NextResponse.json({ url: urlSubida(relativa), width: ancho, height: alto, size: procesada.length });
 }

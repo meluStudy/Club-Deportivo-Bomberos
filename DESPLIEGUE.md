@@ -1,5 +1,8 @@
 # Despliegue: entorno de pruebas y producción
 
+> ¿Solo quieres enseñar la web a alguien antes de contratar nada? Hay una guía
+> aparte para publicar una demo gratuita en quince minutos: **[DEMO.md](DEMO.md)**.
+
 Guía para poner la web en marcha en un **VPS de Hostinger (plan KVM 2)** con
 **Coolify**, en dos entornos: uno de pruebas donde se valida cada cambio y otro
 de producción que ve el público.
@@ -142,6 +145,7 @@ Configuración en las dos:
 - **Port**: `3000`
 - **Health check path**: `/api/salud` — Coolify comprueba ahí que la web está
   viva y hablando con la base de datos antes de dar el despliegue por bueno.
+- **`MEDIA_STORAGE`**: déjalo en `disco` (es el valor por defecto).
 - **Volumen persistente**: origen `/datos/cdb-produccion/uploads` (y
   `/datos/cdb-test/uploads` en pruebas), destino dentro del contenedor
   `/datos/uploads`. Después define `UPLOADS_DIR=/datos/uploads`. **Sin este

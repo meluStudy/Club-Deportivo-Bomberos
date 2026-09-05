@@ -78,6 +78,18 @@ model EmailLog {
   @@index([createdAt])
 }
 
+/// Imagen subida desde el panel cuando el almacenamiento es la base de datos
+/// (alojamientos sin disco persistente). Con almacenamiento en disco no se usa.
+model MediaFile {
+  ruta      String   @id          // "2026/09/abc123.webp"
+  tipo      String                // image/webp
+  ancho     Int
+  alto      Int
+  bytes     Int
+  contenido Bytes
+  createdAt DateTime @default(now())
+}
+
 /// Contador de intentos para limitar accesos y envíos abusivos.
 model RateLimit {
   key          String   @id
