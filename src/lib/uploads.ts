@@ -19,7 +19,7 @@ export type Almacenamiento = "disco" | "base-datos";
 export const almacenamiento = (): Almacenamiento =>
   process.env.MEDIA_STORAGE === "base-datos" ? "base-datos" : "disco";
 
-export const carpetaSubidas = () => process.env.UPLOADS_DIR ?? join(process.cwd(), "uploads");
+export const carpetaSubidas = () => process.env.UPLOADS_DIR || join(process.cwd(), "uploads");
 
 /** Dirección pública de un archivo subido. */
 export const urlSubida = (relativa: string) => `/media/${relativa}`;
