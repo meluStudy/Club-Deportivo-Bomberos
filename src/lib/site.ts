@@ -1,3 +1,23 @@
+/**
+ * Dirección pública de la web. Admite el valor con o sin «https://» y con barra
+ * final. Si falta, en Vercel usa la dirección que asigna Vercel; si no, la local.
+ */
+function direccionWeb() {
+  const valor = (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    ""
+  ).trim();
+  if (!valor) return "http://localhost:3000";
+  const conProtocolo = /^https?:\/\//i.test(valor) ? valor : `https://${valor}`;
+  try {
+    return new URL(conProtocolo).origin;
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+
 export const site = {
   /** Nombre comercial, el que aparece en el logotipo. */
   name: "Club Deportivo Bomberos de Madrid",
@@ -6,7 +26,7 @@ export const site = {
   legalName: "Club Agrupación Deportiva Atlética Bomberos de Madrid",
   description:
     "Club Agrupación Deportiva Atlética Bomberos de Madrid. Atletismo, fútbol, rugby, ciclismo, natación y muchas más secciones. Noticias, eventos, tienda oficial y área de socios.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: direccionWeb(),
   email: "info@clubdeportivobomberos.es",
   address: {
     line: "Parque de Bomberos nº 8, Calle Pío Felipe s/n",

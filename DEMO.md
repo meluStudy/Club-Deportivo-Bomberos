@@ -50,7 +50,6 @@ Es otra razón para que la demo sea temporal.
 ```bash
 DATABASE_URL="postgresql://…"     # la de Neon
 AUTH_SECRET="…"                    # ver más abajo cómo generarlo
-NEXT_PUBLIC_SITE_URL="https://…"   # la que te dé Vercel; se puede corregir después
 MEDIA_STORAGE="base-datos"
 DEMO_MODE="1"
 ADMIN_EMAIL="admin@clubdeportivobomberos.es"
@@ -93,11 +92,13 @@ panel, pero es más engorroso: dímelo y te preparo el archivo SQL para pegarlo.
 
 ## 4. Ajustar la dirección
 
-Vercel te da una dirección del tipo `club-deportivo-bomberos.vercel.app`.
-Cópiala y vuelve a **Settings → Environment Variables** para poner esa misma
-dirección en `NEXT_PUBLIC_SITE_URL`. Luego, en **Deployments**, pulsa
-**Redeploy**. Esto hace que los enlaces de los correos y las redirecciones de
-pago apunten bien.
+En Vercel no hace falta poner `NEXT_PUBLIC_SITE_URL`: si falta, la web usa la
+dirección que le da Vercel (`club-deportivo-bomberos.vercel.app` o parecida).
+
+Cuando tengas un dominio propio, añádelo en **Settings → Environment
+Variables** como `NEXT_PUBLIC_SITE_URL` (vale con o sin `https://`) y pulsa
+**Redeploy** en **Deployments**. Así los enlaces de los correos y las
+redirecciones de pago apuntan al dominio bueno.
 
 ---
 
