@@ -72,21 +72,18 @@ simulada, que es justo lo que quieres para una demo.
 
 ---
 
-## 3. Cargar los datos de ejemplo
+## 3. Los datos de ejemplo se cargan solos
 
-La web ya está en pie, pero la base de datos está vacía. Desde tu ordenador,
-con el repositorio descargado:
+No tienes que hacer nada. Al publicar, Vercel ejecuta `npm run vercel-build`,
+que crea las tablas en Neon y, en modo demo, carga los datos de ejemplo si la
+base de datos está vacía. Si ya tiene usuarios, no toca nada.
 
-```bash
-npm install
-DATABASE_URL="postgresql://…"  npm run db:deploy   # crea las tablas
-DATABASE_URL="postgresql://…"  npm run db:seed     # carga los datos de ejemplo
-```
+Para que funcione, en **Settings → Build and Deployment** el *Build Command*
+debe estar sin cambiar (el interruptor *Override* apagado).
 
-(La misma cadena de conexión de Neon en los dos comandos.)
-
-Si prefieres no tocar nada en tu ordenador, Neon tiene un editor de SQL en su
-panel, pero es más engorroso: dímelo y te preparo el archivo SQL para pegarlo.
+Para comprobar que todo está bien, abre `/api/salud` en la web: debe decir
+`"estado":"ok"`. Si dice `"sin tablas"`, el despliegue no ha preparado la
+base de datos; si dice `"sin conexión"`, revisa `DATABASE_URL`.
 
 ---
 
