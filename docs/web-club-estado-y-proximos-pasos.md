@@ -1,6 +1,6 @@
 # Nueva web del Club Deportivo Bomberos de Madrid
 
-**Estado actual y próximos pasos** · Septiembre de 2026
+**Estado actual y próximos pasos** · Noviembre de 2026
 
 Demo: **https://club-deportivo-bomberos.vercel.app**
 Cuentas de prueba y recorrido guiado: **https://club-deportivo-bomberos.vercel.app/demo**
@@ -147,6 +147,6 @@ En **https://club-deportivo-bomberos.vercel.app/demo** están las cuentas de pru
 - **Socio**: `socio@demo.es` / `Socio1234!`
 - **Participante**: `participante@demo.es` / `Participante1234!`
 - **Responsable de ciclismo**: `ciclismo@demo.es` / `Ciclismo1234!`
-- **Administrador**: ver la página `/demo`.
+- **Administrador**: registraos con vuestro correo y se os dará acceso al panel.
 
 Cualquier comentario, error o idea que surja al probarla sirve para ajustar la web antes de publicarla.
