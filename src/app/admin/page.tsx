@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
               const pct = activeMembers ? Math.round((c / activeMembers) * 100) : 0;
               return (
                 <li key={p.id} className="py-3">
-                  <div className="flex items-center justify-between text-sm"><span className="font-semibold">{p.name}</span><span>{c} socios · {pct}%</span></div>
+                  <div className="flex items-center justify-between text-sm"><span className="font-semibold">{p.name}</span><span>{c} {c === 1 ? "socio" : "socios"} · {pct}%</span></div>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink-100"><div className="h-full rounded-full bg-brand-600" style={{ width: `${pct}%` }} /></div>
                 </li>
               );
