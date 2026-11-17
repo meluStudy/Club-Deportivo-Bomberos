@@ -24,7 +24,7 @@ Duración prevista: **una hora**. Enseña más y explica menos: la demo convence
 
 - [ ] Abre la demo y entra con cada cuenta. Si quieres que esté limpia de tus pruebas, reiníciala (instrucciones al final).
 - [ ] Imprime o envía el PDF *Nueva web del Club* para que cada asistente lo tenga.
-- [ ] Ten a mano la plantilla de la tienda (`plantilla-tienda.xlsx`) para enviarla al terminar.
+- [ ] Ten a mano la plantilla de la tienda (`plantilla-tienda.xlsx`) y el presupuesto (`presupuesto-web-club.pdf`) para enviarlos al terminar.
 
 **Media hora antes**
 
@@ -177,9 +177,19 @@ Ahora mismo, una por persona. Si hace falta, se amplía.
 **¿Se puede usar como aplicación en el móvil?**
 Sí: se instala en la pantalla de inicio y se abre como una app, sin pasar por la tienda de aplicaciones.
 
+### Propuesta económica · 3 minutos
+
+Cuéntalo al final, con calma y sin justificarte de más (diapositivas 15 y 16):
+
+> «La web completa, terminada y puesta en marcha, con la ropa y los socios cargados: 3.000 € más IVA, la mitad al aprobarla y la otra mitad al lanzarla. El mantenimiento son 80 € al mes, o 900 € al año pagando por adelantado. Y cualquier mejora nueva, a 40 € la hora o con un precio cerrado que os paso antes de hacerla.»
+
+> «Como referencia, una agencia presupuestaría una web así entre 6.000 y 12.000 €.»
+
+Recuerda que el servidor, el dominio y Stripe van a nombre del club y los paga directamente (unos 140 € al año más las comisiones de cada cobro), y que todo va detallado en el presupuesto en PDF.
+
 ### Cierre · 1 minuto
 
-> «Os envío hoy el resumen en PDF y la plantilla de la ropa. En cuanto tengamos las decisiones de la Junta, empezamos a montar el servidor.»
+> «Os envío hoy el resumen en PDF, el presupuesto y la plantilla de la ropa. En cuanto tengamos las decisiones de la Junta, empezamos a montar el servidor.»
 
 ---
 
